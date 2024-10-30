@@ -286,18 +286,18 @@
 
                             const infowindow = new google.maps.InfoWindow({
                                 content: `<div><strong>${location.CihazAd || ''}</strong></div>
-                                                           <div><strong>ImeiNo:</strong> ${location.ImeiNo || ''}</div>
-                                                           <div><strong>Ölçüm Yeri:</strong> ${location.OlcumYeri || ''}</div>
-                                                           <div><strong>Su Seviye:</strong> ${location.SuSeviye || ''}</div>
-                                                           <div><strong>Akü:</strong> ${location.Aku || ''}</div>
-                                                           <div><strong>Son Data:</strong> ${location.SonData || ''}</div>
-                                                           <div><strong>Cihaz Adı :</strong> ${location.CihazAd || ''}</div>
-                                                           <div><strong>İl:</strong> ${location.IlAd || ''}</div>
-                                                           <div><strong>İlçe:</strong> ${location.Ilce || ''}</div>
-                                                           <div><strong>IP No:</strong> ${location.IpNo || ''}</div>
-                                                           <div><strong>SIM Kart No:</strong> ${location.SimCardNo || ''}</div>
-                                                           <div><strong>Marka:</strong> ${location.fkMarka || ''}</div>
-                                                           <div><strong>Tip:</strong> ${location.fkTip || ''}</div>`
+                                                                   <div><strong>ImeiNo:</strong> ${location.ImeiNo || ''}</div>
+                                                                   <div><strong>Ölçüm Yeri:</strong> ${location.OlcumYeri || ''}</div>
+                                                                   <div><strong>Su Seviye:</strong> ${location.SuSeviye || ''}</div>
+                                                                   <div><strong>Akü:</strong> ${location.Aku || ''}</div>
+                                                                   <div><strong>Son Data:</strong> ${location.SonData || ''}</div>
+                                                                   <div><strong>Cihaz Adı :</strong> ${location.CihazAd || ''}</div>
+                                                                   <div><strong>İl:</strong> ${location.IlAd || ''}</div>
+                                                                   <div><strong>İlçe:</strong> ${location.Ilce || ''}</div>
+                                                                   <div><strong>IP No:</strong> ${location.IpNo || ''}</div>
+                                                                   <div><strong>SIM Kart No:</strong> ${location.SimCardNo || ''}</div>
+                                                                   <div><strong>Marka:</strong> ${location.fkMarka || ''}</div>
+                                                                   <div><strong>Tip:</strong> ${location.fkTip || ''}</div>`
                             });
 
                             marker.addListener('click', function () {
@@ -327,109 +327,111 @@
         </script>
 
         @*<script>
-            var map;
-            var allMarkers = [];
-            var allCoordinates = [];
+                var map;
+                var allMarkers = [];
+                var allCoordinates = [];
 
-            $(document).ready(function () {
-                initMap();
-                getPasifCihazlar();
+                $(document).ready(function () {
+                    initMap();
+                    getPasifCihazlar();
 
-                function initMap() {
-                    map = new google.maps.Map(document.getElementById('map'), {
-                        center: { lat: 38.50848, lng: 29.69016 }, //uşak,sivaslı
-                        zoom: 8
-                    });
-                }
+                    function initMap() {
+                        map = new google.maps.Map(document.getElementById('map'), {
+                            center: { lat: 38.50848, lng: 29.69016 }, //uşak,sivaslı
+                            zoom: 8
+                        });
+                    }
 
-                function getPasifCihazlar() {
-                    $.ajax({
-                        url: '/Home/GetPasifCihazlar',
-                        method: 'GET',
-                        success: function (data) {
-                            console.log("Data received from server:", data);
-                            var locations = data;
-                            console.log("Parsed locations:", locations);
-                            showLocationsOnMap(locations);
-                        },
-                        error: function (xhr, status, error) {
-                            console.error('There was a problem with the fetch operation:', error);
-                        }
-                    });
-                }
-
-                function showLocationsOnMap(locations) {
-                    clearMarkers();
-                    console.log("Locations to be displayed on map:", locations);
-
-                    locations.forEach(location => {
-                        if (location.KonumX != null && location.KonumY != null) {
-                            let markerColor;
-                            switch (location.Durum) {
-                                case "0":
-                                    markerColor = 'yellow';
-                                    break;
-                                case "1":
-                                    markerColor = 'green';
-                                    break;
-                                default:
-                                    marker.setVisible(false);
-                                    markerColor = 'black';
-                                    break;
+                    function getPasifCihazlar() {
+                        $.ajax({
+                            url: '/Home/GetPasifCihazlar',
+                            method: 'GET',
+                            success: function (data) {
+                                console.log("Data received from server:", data);
+                                var locations = data;
+                                console.log("Parsed locations:", locations);
+                                showLocationsOnMap(locations);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('There was a problem with the fetch operation:', error);
                             }
+                        });
+                    }
 
-                            const marker = new google.maps.Marker({
-                                position: { lat: parseFloat(location.KonumX), lng: parseFloat(location.KonumY) },
-                                map: map,
-                                icon: {
-                                    path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-                                    fillColor: markerColor,
-                                    fillOpacity: 1,
-                                    strokeColor: 'black',
-                                    strokeWeight: 1,
-                                    scale: 7
-                                },
-                                title: location.CihazAd
-                            });
+                    function showLocationsOnMap(locations) {
+                        clearMarkers();
+                        console.log("Locations to be displayed on map:", locations);
 
-                            console.log("Marker added at position:", { lat: parseFloat(location.KonumX), lng: parseFloat(location.KonumY) });
+                        locations.forEach(location => {
+                            if (location.KonumX != null && location.KonumY != null) {
+                                let markerColor;
+                                switch (location.Durum) {
+                                    case "0":
+                                        markerColor = 'yellow';
+                                        break;
+                                    case "1":
+                                        markerColor = 'green';
+                                        break;
+                                    default:
+                                        marker.setVisible(false);
+                                        markerColor = 'black';
+                                        break;
+                                }
 
-                            const infowindow = new google.maps.InfoWindow({
-                                content: `<div><strong>${location.CihazAd || ''}</strong></div>
-                                                              <div><strong>ImeiNo:</strong> ${location.ImeiNo || ''}</div>
-                                                              <div><strong>Ölçüm Yeri:</strong> ${location.OlcumYeri || ''}</div>
-                                                              <div><strong>Su Seviye:</strong> ${location.SuSeviye || ''}</div>
-                                                              <div><strong>Akü:</strong> ${location.Aku || ''}</div>
-                                                              <div><strong>Son Data:</strong> ${location.SonData || ''}</div>
-                                                              <div><strong>Cihaz Adı :</strong> ${location.CihazAd || ''}</div>
-                                                              <div><strong>İl:</strong> ${location.IlAd || ''}</div>
-                                                              <div><strong>İlçe:</strong> ${location.Ilce || ''}</div>
-                                                              <div><strong>IP No:</strong> ${location.IpNo || ''}</div>
-                                                              <div><strong>SIM Kart No:</strong> ${location.SimCardNo || ''}</div>
-                                                              <div><strong>Marka:</strong> ${location.fkMarka || ''}</div>
-                                                              <div><strong>Tip:</strong> ${location.fkTip || ''}</div>`
-                            });
+                                const marker = new google.maps.Marker({
+                                    position: { lat: parseFloat(location.KonumX), lng: parseFloat(location.KonumY) },
+                                    map: map,
+                                    icon: {
+                                        path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+                                        fillColor: markerColor,
+                                        fillOpacity: 1,
+                                        strokeColor: 'black',
+                                        strokeWeight: 1,
+                                        scale: 7
+                                    },
+                                    title: location.CihazAd
+                                });
 
-                            marker.addListener('click', function () {
-                                infowindow.open(map, marker);
-                            });
+                                console.log("Marker added at position:", { lat: parseFloat(location.KonumX), lng: parseFloat(location.KonumY) });
 
-                            allMarkers.push(marker);
-                        } else {
-                            console.warn("Invalid location data:", location);
-                        }
-                    });
-                }
+                                const infowindow = new google.maps.InfoWindow({
+                                    content: `<div><strong>${location.CihazAd || ''}</strong></div>
+                                                                  <div><strong>ImeiNo:</strong> ${location.ImeiNo || ''}</div>
+                                                                  <div><strong>Ölçüm Yeri:</strong> ${location.OlcumYeri || ''}</div>
+                                                                  <div><strong>Su Seviye:</strong> ${location.SuSeviye || ''}</div>
+                                                                  <div><strong>Akü:</strong> ${location.Aku || ''}</div>
+                                                                  <div><strong>Son Data:</strong> ${location.SonData || ''}</div>
+                                                                  <div><strong>Cihaz Adı :</strong> ${location.CihazAd || ''}</div>
+                                                                  <div><strong>İl:</strong> ${location.IlAd || ''}</div>
+                                                                  <div><strong>İlçe:</strong> ${location.Ilce || ''}</div>
+                                                                  <div><strong>IP No:</strong> ${location.IpNo || ''}</div>
+                                                                  <div><strong>SIM Kart No:</strong> ${location.SimCardNo || ''}</div>
+                                                                  <div><strong>Marka:</strong> ${location.fkMarka || ''}</div>
+                                                                  <div><strong>Tip:</strong> ${location.fkTip || ''}</div>`
+                                });
 
-                function clearMarkers() {
-                    allMarkers.forEach(marker => marker.setMap(null));
-                    allMarkers = [];
-                }
-            });
-        </script>*@
+                                marker.addListener('click', function () {
+                                    infowindow.open(map, marker);
+                                });
+
+                                allMarkers.push(marker);
+                            } else {
+                                console.warn("Invalid location data:", location);
+                            }
+                        });
+                    }
+
+                    function clearMarkers() {
+                        allMarkers.forEach(marker => marker.setMap(null));
+                        allMarkers = [];
+                    }
+                });
+            </script>*@
 
 
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZ-ARlakPGzJRf-Cj2_F8ZI46nwkl9CtU&callback=initMap" async defer></script>
+        @*<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZ-ARlakPGzJRf-Cj2_F8ZI46nwkl9CtU&callback=initMap" async defer></script>*@
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6QEcjxD_o5anMlAqh4Aa395xlxmaC0EY&callback=initMap" async defer></script>
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
         <script src="~/vendor/global/global.min.js"></script>
