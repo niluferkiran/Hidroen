@@ -1,0 +1,444 @@
+﻿@{
+    ViewBag.Title = "PasifCihazlar";
+    string apiKey = ViewBag.ApiKey;
+}
+
+<main aria-labelledby="title">
+    <style>
+        .container {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .left-column {
+            width: 1700px;
+            background-color: darkslateblue;
+            padding: 0px;
+        }
+
+        .active-il {
+            background-color: navy;
+            color: white;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px; /* İller listesi ve harita arasında boşluk ekleyin */
+        }
+
+        .right-column {
+            width: 200px;
+            background-color: darkslateblue;
+            padding: 20px;
+        }
+
+        .active-il {
+            background-color: navy;
+            color: white;
+        }
+
+        .mt-2 {
+            background-color: #393360;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .il-item {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+            .il-item:hover {
+                background-color: #332c52;
+                color: #eb8153;
+            }
+
+            .il-item p {
+                margin: 0;
+                font-size: 14px;
+                color: #fff;
+            }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+            .checkbox.checked::before {
+                content: '✔';
+                font-size: 12px;
+                color: #fff;
+            }
+
+
+        /* Sağ üstte sabit duracak bilgi paneli */
+        #info-panel {
+            position: absolute;
+            top: 60px;
+            left: 30px;
+            background-color: white;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 10; /* Haritanın üstünde durması için z-index veriyoruz */
+        }
+
+        /* Bilgi panelindeki semboller ve metinler */
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .info-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+        }
+    </style>
+    <h2 id="title">@*Marka Bazında*@</h2>
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="info-panel">
+                @*<h4>Veri Sembolleri</h4>*@
+                <div id="panel-content">
+                    <!-- Bu alan sabit sembol ve isimlerle doldurulacak -->
+                    <div class="info-item">
+                        <img src="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png" class="info-icon" />
+                        <span>GÖL GÖZLEM</span>
+                    </div>
+                    <div class="info-item">
+                        <img src="https://maps.gstatic.com/mapfiles/ms2/micons/grn-pushpin.png" class="info-icon" />
+                        <span>TEUS</span>
+                    </div>
+                    <div class="info-item">
+                        <img src="~/images/icons8-circle-24.png" class="info-icon" />
+                        <span>KUYU KALİTE GÖZLEM</span>
+                    </div>
+                    <div class="info-item">
+                        <img src="~/images/icons8-triangle-24.png" class="info-icon" />
+                        <span>AGI</span>
+                    </div>
+                    <div class="info-item">
+                        <img src="~/images/symbol_fore_close.png" class="info-icon" />
+                        <span>Debimetre</span>
+                    </div>
+                </div>
+            </div>
+            <div id="map" class="card-body" style="height:750px;"></div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            var map;
+            var allMarkers = [];
+            var allCoordinates = [];
+            var currentInfoWindow = null;
+
+
+            $(document).ready(function () {
+                initMap();
+                getHarita();
+
+                function initMap() {
+                    map = new google.maps.Map(document.getElementById('map'), {
+                        center: { lat: 38.58013936192805, lng: 28.08175943206895 }, // Manisa, Salihli, Pazarköy 38.58013936192805, 28.08175943206895
+                        zoom: 9
+                    });
+                }
+
+                function getHarita() {
+                    $.ajax({
+                        url: '/Home/GetPasifCihazlar',
+                        method: 'GET',
+                        success: function (data) {
+                            console.log("Data received from server:", data);
+                            var locations = data;
+                            console.log("Parsed locations:", locations);
+                            showLocationsOnMap(locations);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('There was a problem with the fetch operation:', error);
+                        }
+                    });
+                }
+
+
+                function showLocationsOnMap(locations) {
+                    clearMarkers();
+                    console.log("Locations to be displayed on map:", locations);
+
+                    locations.forEach(location => {
+                        if (location.KonumX != null && location.KonumY != null) {
+                            let markerIcon;
+
+                            // İlk olarak fkTip
+                            switch (location.CihazAd) {
+                                //case "TEUS":
+                                //    switch (location.Durum) {
+                                //        case "1":
+                                //            markerIcon = "https://maps.gstatic.com/mapfiles/ms2/micons/grn-pushpin.png";  // Yeşil pin simgesi
+                                //            break;
+                                //        case "0":
+                                //            markerIcon = "https://maps.gstatic.com/mapfiles/ms2/micons/ylw-pushpin.png";  // Sarı pin simgesi
+                                //            break;
+                                //    }
+                                //    break;
+                                case location.CihazAd.toLowerCase().includes("teus") ? location.CihazAd : "":  // "TEUS" içeren tüm veriler
+                                    switch (location.Durum) {
+                                        case "1":
+                                            markerIcon = "https://maps.gstatic.com/mapfiles/ms2/micons/grn-pushpin.png";  // Yeşil pin simgesi
+                                            break;
+                                        case "0":
+                                            markerIcon = "https://maps.gstatic.com/mapfiles/ms2/micons/ylw-pushpin.png";  // Sarı pin simgesi
+                                            break;
+                                    }
+                                    break;
+                                case "AGI":
+                                    markerIcon = {
+                                        path: 'M -2,-2 2,-2 0,2 z', // Üçgen (SVG path)
+                                        strokeWeight: 1,
+                                        scale: 7
+                                    };
+                                    break;
+                                case "KANAL GÖZLEM":
+                                    switch (location.Durum) {
+                                        case "1":
+                                            markerIcon = {
+                                                url: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png', // Yeşil pin
+                                                scaledSize: new google.maps.Size(40, 40) // Boyut
+                                            };
+                                            break;
+                                        case "0":
+                                            markerIcon = {
+                                                url: 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png', // Sarı pin
+                                                scaledSize: new google.maps.Size(40, 40)
+                                            };
+                                            break;
+                                    }
+                                    break;
+                                case "Debimetre":
+                                    markerIcon = {
+                                        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, // Ok sembolü
+                                        strokeWeight: 1,
+                                        scale: 7
+                                    };
+                                    break;
+                                case "KUYU KALİTE GÖZLEM":
+                                    markerIcon = {
+                                        path: google.maps.SymbolPath.CIRCLE, // Yuvarlak sembol
+                                        strokeWeight: 1,
+                                        scale: 7
+                                    };
+                                    break;
+                                default:
+                                    markerIcon = {
+                                        path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW, // Varsayılan sembol
+                                        strokeWeight: 1,
+                                        scale: 7
+                                    };
+                                    break;
+                            }
+
+                            // Sonra durum
+                            switch (location.Durum) {
+                                case "1":
+                                    markerIcon.fillColor = 'green';
+                                    markerIcon.fillOpacity = 1;
+                                    markerIcon.strokeColor = 'black';
+                                    break;
+                                case "0":
+                                    markerIcon.fillColor = 'yellow';
+                                    markerIcon.fillOpacity = 1;
+                                    markerIcon.strokeColor = 'orange';
+                                    break;
+                                default:
+                                    markerIcon.fillColor = 'gray';
+                                    markerIcon.fillOpacity = 1;
+                                    markerIcon.strokeColor = 'black';
+                                    break;
+                            }
+
+                            const marker = new google.maps.Marker({
+                                position: { lat: parseFloat(location.KonumX), lng: parseFloat(location.KonumY) },
+                                map: map,
+                                icon: markerIcon,
+                                title: location.CihazAd
+                            });
+
+                            console.log("Marker added at position:", { lat: parseFloat(location.KonumX), lng: parseFloat(location.KonumY) });
+
+                            const infowindow = new google.maps.InfoWindow({
+                                content: `<div><strong>${location.CihazAd || ''}</strong></div>
+                                                           <div><strong>ImeiNo:</strong> ${location.ImeiNo || ''}</div>
+                                                           <div><strong>Ölçüm Yeri:</strong> ${location.OlcumYeri || ''}</div>
+                                                           <div><strong>Su Seviye:</strong> ${location.SuSeviye || ''}</div>
+                                                           <div><strong>Akü:</strong> ${location.Aku || ''}</div>
+                                                           <div><strong>Son Data:</strong> ${location.SonData || ''}</div>
+                                                           <div><strong>Cihaz Adı :</strong> ${location.CihazAd || ''}</div>
+                                                           <div><strong>İl:</strong> ${location.IlAd || ''}</div>
+                                                           <div><strong>İlçe:</strong> ${location.Ilce || ''}</div>
+                                                           <div><strong>IP No:</strong> ${location.IpNo || ''}</div>
+                                                           <div><strong>SIM Kart No:</strong> ${location.SimCardNo || ''}</div>
+                                                           <div><strong>Marka:</strong> ${location.fkMarka || ''}</div>
+                                                           <div><strong>Tip:</strong> ${location.fkTip || ''}</div>`
+                            });
+
+                            marker.addListener('click', function () {
+                                // Eğer daha önce bir InfoWindow açıksa kapat
+                                if (currentInfoWindow) {
+                                    currentInfoWindow.close();
+                                }
+
+                                // Yeni InfoWindow'u aç ve currentInfoWindow olarak ayarla
+                                infowindow.open(map, marker);
+                                currentInfoWindow = infowindow;
+                            });
+
+                            allMarkers.push(marker);
+                        } else {
+                            console.warn("Invalid location data:", location);
+                        }
+                    });
+                }
+
+
+                function clearMarkers() {
+                    allMarkers.forEach(marker => marker.setMap(null));
+                    allMarkers = [];
+                }
+            });
+        </script>
+
+        @*<script>
+            var map;
+            var allMarkers = [];
+            var allCoordinates = [];
+
+            $(document).ready(function () {
+                initMap();
+                getPasifCihazlar();
+
+                function initMap() {
+                    map = new google.maps.Map(document.getElementById('map'), {
+                        center: { lat: 38.50848, lng: 29.69016 }, //uşak,sivaslı
+                        zoom: 8
+                    });
+                }
+
+                function getPasifCihazlar() {
+                    $.ajax({
+                        url: '/Home/GetPasifCihazlar',
+                        method: 'GET',
+                        success: function (data) {
+                            console.log("Data received from server:", data);
+                            var locations = data;
+                            console.log("Parsed locations:", locations);
+                            showLocationsOnMap(locations);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('There was a problem with the fetch operation:', error);
+                        }
+                    });
+                }
+
+                function showLocationsOnMap(locations) {
+                    clearMarkers();
+                    console.log("Locations to be displayed on map:", locations);
+
+                    locations.forEach(location => {
+                        if (location.KonumX != null && location.KonumY != null) {
+                            let markerColor;
+                            switch (location.Durum) {
+                                case "0":
+                                    markerColor = 'yellow';
+                                    break;
+                                case "1":
+                                    markerColor = 'green';
+                                    break;
+                                default:
+                                    marker.setVisible(false);
+                                    markerColor = 'black';
+                                    break;
+                            }
+
+                            const marker = new google.maps.Marker({
+                                position: { lat: parseFloat(location.KonumX), lng: parseFloat(location.KonumY) },
+                                map: map,
+                                icon: {
+                                    path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+                                    fillColor: markerColor,
+                                    fillOpacity: 1,
+                                    strokeColor: 'black',
+                                    strokeWeight: 1,
+                                    scale: 7
+                                },
+                                title: location.CihazAd
+                            });
+
+                            console.log("Marker added at position:", { lat: parseFloat(location.KonumX), lng: parseFloat(location.KonumY) });
+
+                            const infowindow = new google.maps.InfoWindow({
+                                content: `<div><strong>${location.CihazAd || ''}</strong></div>
+                                                              <div><strong>ImeiNo:</strong> ${location.ImeiNo || ''}</div>
+                                                              <div><strong>Ölçüm Yeri:</strong> ${location.OlcumYeri || ''}</div>
+                                                              <div><strong>Su Seviye:</strong> ${location.SuSeviye || ''}</div>
+                                                              <div><strong>Akü:</strong> ${location.Aku || ''}</div>
+                                                              <div><strong>Son Data:</strong> ${location.SonData || ''}</div>
+                                                              <div><strong>Cihaz Adı :</strong> ${location.CihazAd || ''}</div>
+                                                              <div><strong>İl:</strong> ${location.IlAd || ''}</div>
+                                                              <div><strong>İlçe:</strong> ${location.Ilce || ''}</div>
+                                                              <div><strong>IP No:</strong> ${location.IpNo || ''}</div>
+                                                              <div><strong>SIM Kart No:</strong> ${location.SimCardNo || ''}</div>
+                                                              <div><strong>Marka:</strong> ${location.fkMarka || ''}</div>
+                                                              <div><strong>Tip:</strong> ${location.fkTip || ''}</div>`
+                            });
+
+                            marker.addListener('click', function () {
+                                infowindow.open(map, marker);
+                            });
+
+                            allMarkers.push(marker);
+                        } else {
+                            console.warn("Invalid location data:", location);
+                        }
+                    });
+                }
+
+                function clearMarkers() {
+                    allMarkers.forEach(marker => marker.setMap(null));
+                    allMarkers = [];
+                }
+            });
+        </script>*@
+
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZ-ARlakPGzJRf-Cj2_F8ZI46nwkl9CtU&callback=initMap" async defer></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <script src="~/vendor/global/global.min.js"></script>
+        <script src="~/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+        <script src="~/vendor/chart.js/Chart.bundle.min.js"></script>
+        <script src="~/vendor/owl-carousel/owl.carousel.js"></script>
+        <script src="~/js/custom.min.js"></script>
+    }
+</main>
+
+
+

@@ -1,0 +1,1921 @@
+﻿
+@{
+    ViewBag.Title = "DetayGor";
+    int Id = ViewBag.id;
+    string cihazAd = ViewBag.cihazAd as string;
+    var alarm1List = ViewBag.Alarm1;
+    var alarm2List = ViewBag.Alarm2;
+    var maxi = ViewBag.maxi;
+    var mini = ViewBag.mini;
+    var ort = ViewBag.ort;
+
+}
+
+
+@*@model List<SusisProject_V6.Controllers.HomeController.CihazListModel2>*@
+
+@model List<SusisProject_V6.Controllers.HomeController.CihazListModel3>
+
+@*@model List<SusisProject_V6.Controllers.HomeController.CihazPageViewModel>*@
+
+@*@{
+    var carouselImages = ViewBag.CarouselImages as List<string>;
+}*@
+
+
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+<link href="https://cdn.rawgit.com/mdehoog/Semantic-UI/6e6d051d47b598ebab05857545f242caf2b4b48c/dist/semantic.min.css" rel="stylesheet" type="text/css" />
+<meta charset="utf-8">
+
+<title>JS Bin</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    body {
+        background-color: #2C254A; /* Koyu arka plan rengi */
+        color: white; /* Metin rengi beyaz */
+    }
+
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background-color: #2C254A; /* Koyu buton arka plan rengi */
+        color: white;
+        border: 2px solid #2C254A; /* Beyaz çerçeve */
+        border-radius: 50%; /* Yuvarlak buton */
+        cursor: pointer;
+        font-size: 24px; /* Ok işareti boyutu */
+    }
+
+    .custom-container {
+        background-color: #2C254A;
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+    }
+
+        .custom-container .btn {
+            margin-right: 7px;
+        }
+
+    .chart-content {
+        color: white;
+    }
+
+    .legend svg {
+        margin-right: 5px;
+    }
+
+    /*batarya*/
+    .signal-container {
+        display: flex;
+        align-items: center;
+        background-color: #2c2651;
+        padding: 10px;
+        border-radius: 5px;
+        color: #fff;
+        font-family: Arial, sans-serif;
+    }
+
+    .signal-text {
+        margin-right: 10px;
+    }
+
+    .battery {
+        display: flex;
+        border: 0px #2c254a;
+        padding: 2px;
+        width: 100px;
+        height: 20px;
+        background-color: #2c254a;
+        border-radius: 3px;
+        position: relative;
+    }
+
+    .battery_item {
+        flex: 1;
+        margin: 0 1px;
+        background-color: #ddd;
+        height: 100%;
+        border-radius: 2px;
+    }
+
+        .battery_item.filled {
+            background-color: #ff9800;
+        }
+    /*chart*/
+    .chart-container {
+        position: relative;
+        /*height: 450px;*/
+    }
+
+    /* body {
+        background-color: #1c1c3d;
+        color: #ffffff;
+        font-family: Arial, sans-serif;
+    }*/
+
+    .limit-selection {
+        margin: 20px;
+        text-align: center;
+    }
+
+        .limit-selection label {
+            margin-right: 10px;
+        }
+
+    carousel-inner {
+        width: 100%;
+        max-height: 500px; /* Carousel'in maksimum yüksekliği */
+    }
+
+    .carousel-image {
+        width: 100%;
+        height: auto;
+        max-height: 500px; /* Resmin maksimum yüksekliği, carousel ile uyumlu olmalı */
+        object-fit: cover; /* Resmin konteyneri tam olarak kaplamasını sağlar */
+    }
+</style>
+<main>
+    <div class="row">
+        <div class="form-head mb-3" style="margin-top: 20px; justify-content: center; display: flex; align-items: center; flex-grow: 1; float: left;">
+
+            <button class="btn-back" onclick="goBack()" style="float: left; padding-left: 5px; margin-right: 10px;">←</button>
+            <label style="float:left; padding-left: 10px !important; padding-top: 8px; margin-right: 10px;">Baş.:</label>
+
+            <div class="ui calendar" id="example2">
+                <div class="ui input left icon" style="width: 130px; color: white; margin-right: 4px; height: 36.5px;">
+                    <i class="calendar icon"></i>
+                    <input type="text" id="datePickerStart" placeholder="Date" style="border-color: green; background-color: #2C254A; color:gray;" onchange="updateChart()">
+                </div>
+            </div>
+            <div class="ui calendar" id="example3">
+                <div class="ui input left icon" style="width: 90px; color: white; height: 36.5px;">
+                    <i class="time icon"></i>
+                    <input type="text" id="timePickerStart" placeholder="Time" style="border-color: green; background-color: #2C254A; color: gray;" onchange="updateChart()">
+                </div>
+            </div>
+
+            <label style="float: left; padding-left: 10px; padding-top: 8px; margin-right: 5px;">- Bit.:</label>
+
+            <div class="ui calendar" id="example2">
+                <div class="ui input left icon" style="width: 130px; color: white; margin-right: 4px; height: 36.5px;">
+                    <i class="calendar icon"></i>
+                    <input type="text" id="datePickerEnd" placeholder="Date" style="border-color: green; background-color: #2C254A; color: gray;" onchange="updateChart()">
+                </div>
+            </div>
+            <div class="ui calendar" id="example3">
+                <div class="ui input left icon" style="width: 90px; color: white; height: 36.5px;">
+                    <i class="time icon"></i>
+                    <input type="text" id="timePickerEnd" placeholder="Time" style="border-color: green; background-color: #2C254A; color: gray;" onchange="updateChart()">
+                </div>
+            </div>
+
+        </div>
+
+        <div style="float: right; justify-content: center; justify-content: flex-end; gap: 10px; display: flex; align-items: center; flex-grow: 1; margin-right: 50px;">
+            @*<button type="button" class="btn btn-outline-success" style=" margin-left: 5px;"><i class="bi bi-arrow-clockwise" style="margin-right:6px;"></i>Yenile</button>
+            <button type="button" class="btn btn-outline-info" style="margin-left: 5px; "><i class="bi bi-file-earmark-excel" style=" margin-right: 6px; "></i>Excell'e Aktar</button>*@
+            <button type="button" class="btn btn-outline-success" style=" margin-left: 5px;"><i class="bi bi-arrow-clockwise" style="margin-right: 6px; "></i>Yenile</button>
+            <button type="button" class="btn btn-outline-info" style="margin-left: 5px; "><i class="bi bi-file-earmark-excel" style=" margin-right: 6px; "></i>Excell'e Aktar</button>
+            @*<button type="button" class="btn btn-outline-dark" style="margin-right: 5px; "><i class="bi bi-image" style=" margin-right: 6px; "></i>Kesit Resim</button>
+            <button type="button" class="btn btn-outline-danger" style=" margin-right: 5px;"><i class="bi bi-chat-left-text" style=" margin-right: 6px; "></i>Afad SMS</button>
+            <button type="button" class="btn btn-outline-secondary" style="margin-right: 5px; ">Tanımlar</button>*@
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 mt-1" style=" height: 105px;">
+            <div class="card" style="margin-right:10px;">
+                <div class="card-header d-sm-flex d-block pb-0 border-0">
+                    <div>
+                        <h4 class="fs-20 text-black">
+                            <strong> @cihazAd </strong> <input type="hidden" id="viewBagId" value="@Id" />
+                        </h4>
+                    </div>
+
+                    <div class="d-block mt-3 mt-sm-0 mb-0" style="padding-top: 6px; padding-left: 700px;">
+                        <label style=" margin-right:10px;">Versiyon:</label>
+                    </div>
+                    <div class="d-block mt-3 mt-sm-0 mb-0" style="float:inline-end;">
+                        <label style="padding-top:10px; margin-right:2px;">Çekim Gücü:</label>
+                        <div class="signal-container" style="float:right;">
+                            <div class="signal-text"> <span id="signalStrength" style="color:orange;">%39</span></div>
+                            <div class="battery">
+                                <span class="battery_item"></span>
+                                <span class="battery_item"></span>
+                                <span class="battery_item"></span>
+                                <span class="battery_item"></span>
+                                <span class="battery_item"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xl-3 col-xxl-4 col-lg-12 col-sm-12">
+            <div class="card" style="height:auto;">
+                <div class="card-body pb-0" style="position: relative;">
+                    @*<div id="currentChart" class="current-chart" style="min-height: 201.163px;">*@
+                    <div id="apexchartsesqsi2ua" class="apexcharts-canvas apexchartsesqsi2ua apexcharts-theme-light" style="width: 306px; height: 201.163px;">
+                        <svg id="SvgjsSvg1851" width="306" height="201.1630859375" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" class="apexcharts-svg" xmlns:data="ApexChartsNS" transform="translate(0, 0)" style="background: transparent;"><g id="SvgjsG1853" class="apexcharts-inner apexcharts-graphical" transform="translate(8.5, 0)"><defs id="SvgjsDefs1852"><clipPath id="gridRectMaskesqsi2ua"><rect id="SvgjsRect1855" width="297" height="315" x="-3" y="-1" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath><clipPath id="gridRectMarkerMaskesqsi2ua"><rect id="SvgjsRect1856" width="295" height="317" x="-2" y="-2" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect></clipPath></defs><g id="SvgjsG1857" class="apexcharts-radialbar"><g id="SvgjsG1858"><g id="SvgjsG1859" class="apexcharts-tracks"><g id="SvgjsG1860" class="apexcharts-radialbar-track apexcharts-track" rel="1"><path id="apexcharts-radialbarTrack-0" d="M 27.441463414634143 145.49999999999997 A 118.05853658536586 118.05853658536586 0 0 1 263.55853658536586 145.5" fill="none" fill-opacity="1" stroke="rgba(242,242,242,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="8.337268292682928" stroke-dasharray="0" class="apexcharts-radialbar-area" data:pathOrig="M 27.441463414634143 145.49999999999997 A 118.05853658536586 118.05853658536586 0 0 1 263.55853658536586 145.5"></path></g><g id="SvgjsG1862" class="apexcharts-radialbar-track apexcharts-track" rel="2"><path id="apexcharts-radialbarTrack-1" d="M 41.036585365853654 145.5 A 104.46341463414635 104.46341463414635 0 0 1 249.96341463414635 145.5" fill="none" fill-opacity="1" stroke="rgba(242,242,242,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="8.337268292682928" stroke-dasharray="0" class="apexcharts-radialbar-area" data:pathOrig="M 41.036585365853654 145.5 A 104.46341463414635 104.46341463414635 0 0 1 249.96341463414635 145.5"></path></g><g id="SvgjsG1864" class="apexcharts-radialbar-track apexcharts-track" rel="3"><path id="apexcharts-radialbarTrack-2" d="M 54.631707317073165 145.5 A 90.86829268292684 90.86829268292684 0 0 1 236.36829268292684 145.5" fill="none" fill-opacity="1" stroke="rgba(242,242,242,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="8.337268292682928" stroke-dasharray="0" class="apexcharts-radialbar-area" data:pathOrig="M 54.631707317073165 145.5 A 90.86829268292684 90.86829268292684 0 0 1 236.36829268292684 145.5"></path></g><g id="SvgjsG1866" class="apexcharts-radialbar-track apexcharts-track" rel="4"><path id="apexcharts-radialbarTrack-3" d="M 68.22682926829268 145.5 A 77.27317073170732 77.27317073170732 0 0 1 222.77317073170732 145.5" fill="none" fill-opacity="1" stroke="rgba(242,242,242,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="8.337268292682928" stroke-dasharray="0" class="apexcharts-radialbar-area" data:pathOrig="M 68.22682926829268 145.5 A 77.27317073170732 77.27317073170732 0 0 1 222.77317073170732 145.5"></path></g></g><g id="SvgjsG1868"><g id="SvgjsG1873" class="apexcharts-series apexcharts-radial-series" seriesName="Income" rel="1" data:realIndex="0"><path id="SvgjsPath1874" d="M 27.441463414634143 145.49999999999997 A 118.05853658536586 118.05853658536586 0 0 1 250.69092633369212 91.9025459770902" fill="none" fill-opacity="0.85" stroke="rgba(236,129,83,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="8.595121951219515" stroke-dasharray="0" class="apexcharts-radialbar-area apexcharts-radialbar-slice-0" data:angle="153" data:value="85" index="0" j="0" data:pathOrig="M 27.441463414634143 145.49999999999997 A 118.05853658536586 118.05853658536586 0 0 1 250.69092633369212 91.9025459770902"></path></g><g id="SvgjsG1875" class="apexcharts-series apexcharts-radial-series" seriesName="Income" rel="2" data:realIndex="1"><path id="SvgjsPath1876" d="M 41.036585365853654 145.5 A 104.46341463414635 104.46341463414635 0 0 1 177.7809704123878 46.14938879775262" fill="none" fill-opacity="0.85" stroke="rgba(112,185,68,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="8.595121951219515" stroke-dasharray="0" class="apexcharts-radialbar-area apexcharts-radialbar-slice-1" data:angle="108" data:value="60" index="0" j="1" data:pathOrig="M 41.036585365853654 145.5 A 104.46341463414635 104.46341463414635 0 0 1 177.7809704123878 46.14938879775262"></path></g><g id="SvgjsG1877" class="apexcharts-series apexcharts-radial-series" seriesName="Imcome" rel="3" data:realIndex="2"><path id="SvgjsPath1878" d="M 54.631707317073165 145.5 A 90.86829268292684 90.86829268292684 0 0 1 192.30063053377802 67.6106708415661" fill="none" fill-opacity="0.85" stroke="rgba(73,139,217,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="8.595121951219515" stroke-dasharray="0" class="apexcharts-radialbar-area apexcharts-radialbar-slice-2" data:angle="121" data:value="67" index="0" j="2" data:pathOrig="M 54.631707317073165 145.5 A 90.86829268292684 90.86829268292684 0 0 1 192.30063053377802 67.6106708415661"></path></g><g id="SvgjsG1879" class="apexcharts-series apexcharts-radial-series" seriesName="Income" rel="4" data:realIndex="3"><path id="SvgjsPath1880" d="M 68.22682926829268 145.5 A 77.27317073170732 77.27317073170732 0 0 1 145.5 68.22682926829268" fill="none" fill-opacity="0.85" stroke="rgba(102,71,191,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="8.595121951219515" stroke-dasharray="0" class="apexcharts-radialbar-area apexcharts-radialbar-slice-3" data:angle="90" data:value="50" index="0" j="3" data:pathOrig="M 68.22682926829268 145.5 A 77.27317073170732 77.27317073170732 0 0 1 145.5 68.22682926829268"></path></g><circle id="SvgjsCircle1869" r="68.10453658536585" cx="145.5" cy="145.5" class="apexcharts-radialbar-hollow" fill="transparent"></circle><g id="SvgjsG1870" class="apexcharts-datalabels-group" transform="translate(0, 0) scale(1)" style="opacity: 0;"><text id="SvgjsText1871" font-family="Helvetica, Arial, sans-serif" x="145.5" y="145.5" text-anchor="middle" dominant-baseline="auto" font-size="22px" font-weight="400" fill="#ec8153" class="apexcharts-text apexcharts-datalabel-label" style="font-family: Helvetica, Arial, sans-serif; fill: rgb(236, 129, 83);">Income</text><text id="SvgjsText1872" font-family="Helvetica, Arial, sans-serif" x="145.5" y="177.5" text-anchor="middle" dominant-baseline="auto" font-size="16px" font-weight="400" fill="#373d3f" class="apexcharts-text apexcharts-datalabel-value" style="font-family: Helvetica, Arial, sans-serif;">85%</text></g></g></g></g><line id="SvgjsLine1881" x1="0" y1="0" x2="291" y2="0" stroke="#b6b6b6" stroke-dasharray="0" stroke-width="1" class="apexcharts-ycrosshairs"></line><line id="SvgjsLine1882" x1="0" y1="0" x2="291" y2="0" stroke-dasharray="0" stroke-width="0" class="apexcharts-ycrosshairs-hidden"></line></g><g id="SvgjsG1854" class="apexcharts-annotations"></g></svg><div class="apexcharts-legend"></div>
+                    </div>
+                    @*</div>*@
+                    <div class="chart-content">
+                        <div class="d-flex justify-content-between mb-2 align-items-center">
+                            <div>
+                                <svg class="mr-2" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="15" height="15" rx="7.5" fill="#EB8153"></rect>
+                                </svg>
+                                <span class="fs-14">Max :</span>
+                            </div>
+                            <div>
+                                <h5 id="cihazmaxi" class="mb-0">@ViewBag.maxi</h5>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 align-items-center">
+                            <div>
+                                <svg class="mr-2" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="15" height="15" rx="7.5" fill="#71B945"></rect>
+                                </svg>
+
+                                <span class="fs-14">Min :</span>
+                            </div>
+                            <div>
+                                <h5 id="cihazmini" class="mb-0">@ViewBag.mini</h5>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 align-items-center">
+                            <div>
+                                <svg class="mr-2" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="15" height="15" rx="7.5" fill="#4A8CDA"></rect>
+                                </svg>
+                                <span class="fs-14">Ort :</span>
+                            </div>
+                            <div>
+                                <h5 id="cihazort" class="mb-0">@((ViewBag.ort != null) ? ViewBag.ort.ToString("F2") : "N/A")</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="resize-triggers"><div class="expand-trigger"><div style="width: 367px; height: 429px;"></div></div><div class="contract-trigger"></div></div>
+
+                    @*@if (ViewBag.CarouselImages != null && ViewBag.CarouselImages.Count > 0)
+                    {
+                        <div class="bootstrap-carousel" style="margin-bottom: 40px;">
+                            <div id="carouselExampleIndicators2" class="carousel slide" data-ride="carousel">
+                                <ol class="carousel-indicators">
+                                    @for (int i = 0; i < ViewBag.CarouselImages.Count; i++)
+                                    {
+                                        <li data-target="#carouselExampleIndicators2" data-slide-to="@i" class="@(i == 0 ? "active" : "")"></li>
+                                    }
+                                </ol>
+                                <div class="carousel-inner">
+                                    @for (int i = 0; i < ViewBag.CarouselImages.Count; i++)
+                                    {
+                                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                                            <button class="d-block w-100 carousel-button"
+                                                    style=" background-size: cover; height: 70px;"
+                                                    onclick="openImage('@ViewBag.CarouselImages[i]')">
+                                             
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                                <a class="carousel-control-prev" href="#carouselExampleIndicators2" data-slide="prev">
+                                    <span class="carousel-control-prev-icon"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="carousel-control-next" href="#carouselExampleIndicators2" data-slide="next">
+                                    <span class="carousel-control-next-icon"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <p hidden>Görüntülenecek resim bulunamadı.</p>
+                    }*@
+
+                </div>
+
+            </div>
+        </div>
+        <div class="col-xl-9 col-xxl-8 col-lg-12 col-sm-12">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card" style="margin-right:10px;">
+                        @*<div class="limit-selection">
+                                <input type="checkbox" id="limit1" name="limit1" checked>
+                                <label for="limit1">Limit 1</label>
+                                <input type="checkbox" id="limit2" name="limit2" checked>
+                                <label for="limit2">Limit 2</label>
+                                <input type="checkbox" id="limit3" name="limit3" checked>
+                                <label for="limit3">Limit 3</label>
+                                <input type="checkbox" id="limit4" name="limit4">
+                                <label for="limit4">Limit 4</label>
+                                <button onclick="updateChart()">Update Chart</button>
+                            </div>*@
+                        <div class="chart-container">
+                            <canvas id="myChart" style="height:250px;"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="card" style="margin-right:10px;">
+                        @*<div class="card-header">
+                                <h4 class="card-title">Recent Payments Queue</h4>
+                            </div>*@
+                        <div class="card-body">
+                            <div class="table-responsive recentOrderTable">
+                                <table class="table verticle-middle table-responsive-md">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Tarih</th>
+                                            <th scope="col">Data Time</th>
+                                            <th scope="col">Seviye</th>
+                                            <th scope="col">Aku Volt</th>
+                                            @*<th scope="col">Seviye</th>*@
+                                            @*<th scope="col">Resim</th>*@
+                                            <th scope="col">Sıcaklık</th>
+                                            @*<th scope="col"></th>*@
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var device in Model)
+                                        {
+                                            <tr style="@(device.Alarm_Durum ? "background-color: #fad7a0; font-weight: bold; color: #ba4a00;" : "")">
+                                                <td>@device.Real_Data_Time</td>
+                                                <td>@device.Gönderim_Zamanı</td>
+                                                <td>@device.SensorVeri</td>
+                                                <td>@device.Akü_Veri</td>
+                                                @*<td>@device.Seviye</td>*@
+                                                <td>@device.Sicaklik</td>
+                                                <td>
+                                                    @if (!string.IsNullOrEmpty(device.Resim))
+                                                    {
+                                                        <button type="button" class="btn btn-outline-info" style="margin-left: 5px; " onclick="openImage('@device.Resim')">Resim Gör</button>
+
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @section scripts{
+        <script>
+            function openImage(imageUrl) {
+                window.open(imageUrl, '_blank');
+            }
+        </script>
+        <script>
+            let chart;
+            const chartData = {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Alarm 1',
+                        data: [],
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        fill: false
+                    },
+                    {
+                        label: 'Alarm 2',
+                        data: [],
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: false
+                    },
+                    {
+                        label: 'Seviye',
+                        data: [],
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: true
+                    }
+                ]
+            };
+
+            // Grafik çizme fonksiyonu
+            function drawChart() {
+                const ctx = document.getElementById('myChart').getContext('2d');
+                if (chart) {
+                    chart.destroy(); // Mevcut grafik varsa önceki grafiği yok et
+                }
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        spanGaps: true,
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'minute',
+                                    tooltipFormat: 'YYYY-MM-DD HH:mm',
+                                    displayFormats: {
+                                        minute: 'YYYY-MM-DD HH:mm'
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Time'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                min: 0,
+                                ticks: {
+                                    stepSize: 100
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Value'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Tarihi seçmek için flatpickr kullanımı
+            document.addEventListener("DOMContentLoaded", function () {
+                var startDatePicker = flatpickr("#datePickerStart", {
+                    dateFormat: "Y-m-d",
+                    defaultDate: "today",
+                    onChange: function (selectedDates, dateStr, instance) {
+                        endDatePicker.set('minDate', dateStr);
+                        updateChart(); // Tarih aralığı değiştiğinde otomatik güncelle
+                    }
+                });
+
+                var endDatePicker = flatpickr("#datePickerEnd", {
+                    dateFormat: "Y-m-d",
+                    defaultDate: "today",
+                    onChange: function () {
+                        updateChart(); // Tarih aralığı değiştiğinde otomatik güncelle
+                    }
+                });
+                // Initialize time pickers with Flatpickr
+                var startTimePicker = flatpickr("#timePickerStart", {
+                    enableTime: true,
+                    noCalendar: true,
+                    dateFormat: "H:i", // Use 24-hour format
+                    defaultDate: "today", // Default time, can adjust as needed
+                    onChange: function () {
+                        updateChart(); // Automatically update chart when time changes
+                    }
+                });
+
+                var endTimePicker = flatpickr("#timePickerEnd", {
+                    enableTime: true,
+                    noCalendar: true,
+                    dateFormat: "H:i", // Use 24-hour format
+                    defaultDate: "today", // Default time, can adjust as needed
+                    onChange: function () {
+                        updateChart(); // Automatically update chart when time changes
+                    }
+                });
+
+                // Function to get the combined date and time string
+                function getCombinedDateTime(dateInput, timeInput) {
+                    return dateInput + " " + timeInput; // Returns a string in the format "YYYY-MM-DD HH:mm"
+                }
+
+                // İlk yükleme sırasında grafik verilerini yükleme
+                const viewBagId = document.getElementById("viewBagId").value;
+                const fkcihaz = viewBagId;
+                let tar1 = "2024-01-01"; // Başlangıç tarihi
+                let tar2 = "2024-12-31"; // Bitiş tarihi
+                let tip = 1; // Sabit tip
+
+                // Sayfa yüklendiğinde ilk veri setini al
+                birinciAjaxCagrisi(fkcihaz);
+
+                // Grafik güncelleme fonksiyonu (tarih aralığı seçildiğinde çalışacak)
+                function updateChart() {
+                    var startTimePicker = document.getElementById("timePickerStart");
+                    var endTimePicker = document.getElementById("timePickerEnd");
+                    let selectedStartDate = startDatePicker.input.value; // Selected start date
+                    let selectedStartTime = startTimePicker.value; // Selected start time
+                    let selectedEndDate = endDatePicker.input.value; // Selected end date
+                    let selectedEndTime = endTimePicker.value; // Selected end time
+
+                    // Combine date and time into a complete datetime string
+                    tar1 = getCombinedDateTime(selectedStartDate, selectedStartTime);
+                    tar2 = getCombinedDateTime(selectedEndDate, selectedEndTime);
+                    console.log(tar1, tar2); // For debugging
+                    // İkinci AJAX ile Seviye verisini güncelle
+                    ikinciAjaxCagrisi(fkcihaz, tar1, tar2, tip);
+                    fetchData(fkcihaz, tar1, tar2)
+                }
+
+                // Alarm1 ve Alarm2 verilerini almak için birinci AJAX çağrısı
+                function birinciAjaxCagrisi(fkcihaz) {
+                    $.ajax({
+                        url: '/Home/GetCihazDataInterval2', // Controller'daki metodun URL'si
+                        type: 'GET',
+                        data: {
+                            id: fkcihaz
+                        },
+                        success: function (data) {
+                            console.log('Veri başarıyla alındı:', data);
+
+                            // Chart.js için verileri düzenleme
+                            //let alarm1Value = data[0].Alarm1; // Alarm1 değeri
+                            //let alarm2Value = data[0].Alarm2; // Alarm2 değeri
+
+                            //// Console'da yazdırma
+                            //console.log('Alarm 1 Değeri:', alarm1Value);
+                            //console.log('Alarm 2 Değeri:', alarm2Value);
+
+                            //// Chart.js verilerini güncelleme
+                            //chartData.datasets[0].data = [alarm1Value]; // Alarm 1 verisi
+                            //chartData.datasets[1].data = [alarm2Value]; // Alarm 2 verisi
+
+                            // İkinci AJAX çağrısını tetikle
+                            ikinciAjaxCagrisi(fkcihaz, tar1, tar2, tip);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX çağrısı sırasında bir hata oluştu:', status, error);
+                            console.log('Hata mesajı:', xhr.responseText);
+                        }
+                    });
+                }
+
+                // Seviye verilerini almak için ikinci AJAX çağrısı
+                function ikinciAjaxCagrisi(fkcihaz, tar1, tar2, tip) {
+                    $.ajax({
+                        url: '/Home/GetCihazList3', // Controller'daki metodun URL'si
+                        type: 'GET',
+                        data: {
+                            fkcihaz: fkcihaz,
+                            tar1: tar1, // Başlangıç tarihi
+                            tar2: tar2, // Bitiş tarihi
+                            tip: tip
+                        },
+                        success: function (data) {
+                            $('.recentOrderTable tbody').empty();
+                            if (data && data.length > 0) {
+                                let seviyeData = [];
+                                let labels = [];
+                                let alarm1s = [];
+                                let alarm2s = [];
+                                let tableRows = '';
+                                // API'den dönen verileri işle
+                                data.forEach(item => {
+                                    let realDataTime = convertJsonDate(item.Real_Data_Time); // Tarih formatını düzenl
+                                    let gonderimZamani = convertJsonDate(item.Gönderim_Zamanı); // Tarih formatını düzenle
+                                    labels.push(realDataTime); // Zaman etiketlerini ekle
+                                      seviyeData.push(item.Seviye !== null ? item.Seviye : NaN); // 'Seviye' verisini ekle
+                                   /* seviyeData.push(item.Seviye !== null ? parseFloat((item.Seviye / 10).toFixed(2)) : NaN); */
+
+
+                                    alarm1s.push(@alarm1List);
+                                    alarm2s.push(@alarm2List);
+                                    tableRows += `
+                        <tr style="${item.Alarm_Durum} ? "background-color: #fad7a0; font-weight: bold; color: #ba4a00;" : "")">
+                            <td>${realDataTime}</td>
+                            <td>${gonderimZamani}</td>
+                            <td>${item.SensorVeri}</td>
+                            <td>${item.Akü_Veri}</td>
+                            <td>${item.Sicaklik !== null ? item.Sicaklik : ''}</td>
+                            <td>
+                                ${item.Resim ? `<button type="button" class="btn btn-outline-info" style="margin-left: 5px;" onclick="openImage('${item.Resim}')">Resim Gör</button>` : ''}
+                            </td>
+                        </tr>
+                    `;
+                                });
+                                $('.recentOrderTable tbody').html(tableRows);
+
+                                // Grafik verilerini güncelle
+                                chartData.labels = labels;
+                                chartData.datasets[2].data = seviyeData;
+                                chartData.datasets[0].data = alarm1s; // Alarm 1 verisi
+                                chartData.datasets[1].data = alarm2s; // Alarm 2 verisi
+                                // Grafiği yeniden çiz
+                                drawChart();
+                            } else {
+                                console.log("No data returned.");
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error during AJAX call:', status, error);
+                            console.log('Error message:', xhr.responseText);
+                        }
+                    });
+                }
+            });
+
+            // JSON tarih formatını çevirmek için fonksiyon
+            function convertJsonDate(jsonDate) {
+                const timestamp = parseInt(jsonDate.replace("/Date(", "").replace(")/", ""), 10);
+                const date = new Date(timestamp);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear();
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                const seconds = date.getSeconds().toString().padStart(2, '0');
+                return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+            }
+        </script>
+
+        @*<script>
+                let chart;
+                const chartData = {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Alarm 1',
+                            data: [],
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                            fill: false
+                        },
+                        {
+                            label: 'Alarm 2',
+                            data: [],
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            fill: false
+                        },
+                        {
+                            label: 'Seviye',
+                            data: [],
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: true
+                        }
+                    ]
+                };
+
+                // Grafik çizme fonksiyonu
+                function drawChart() {
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    if (chart) {
+                        chart.destroy(); // Mevcut grafik varsa önceki grafiği yok et
+                    }
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            spanGaps: true,
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'minute',
+                                        tooltipFormat: 'YYYY-MM-DD HH:mm',
+                                        displayFormats: {
+                                            minute: 'YYYY-MM-DD HH:mm'
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Time'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    min: 0,
+                                    ticks: {
+                                        stepSize: 100
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Value'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // Tarihi seçmek için flatpickr kullanımı
+                document.addEventListener("DOMContentLoaded", function () {
+                    var startDatePicker = flatpickr("#datePickerStart", {
+                        dateFormat: "Y-m-d",
+                        defaultDate: "today",
+                        onChange: function (selectedDates, dateStr, instance) {
+                            endDatePicker.set('minDate', dateStr);
+                            updateChart(); // Tarih aralığı değiştiğinde otomatik güncelle
+                        }
+                    });
+
+                    var endDatePicker = flatpickr("#datePickerEnd", {
+                        dateFormat: "Y-m-d",
+                        defaultDate: "today",
+                        onChange: function () {
+                            updateChart(); // Tarih aralığı değiştiğinde otomatik güncelle
+                        }
+                    });
+
+                    // İlk yükleme sırasında grafik verilerini yükleme
+                    const viewBagId = document.getElementById("viewBagId").value;
+                    const fkcihaz = viewBagId;
+                    let tar1 = "2024-01-01"; // Başlangıç tarihi
+                    let tar2 = "2024-12-31"; // Bitiş tarihi
+                    let tip = 1; // Sabit tip
+
+                    // Sayfa yüklendiğinde ilk veri setini al
+                    ikinciAjaxCagrisi(fkcihaz, tar1, tar2, tip);
+
+                    // Grafik güncelleme fonksiyonu (tarih aralığı seçildiğinde çalışacak)
+                    function updateChart() {
+                        tar1 = startDatePicker.input.value; // Seçilen başlangıç tarihi
+                        tar2 = endDatePicker.input.value;   // Seçilen bitiş tarihi
+
+                        // AJAX ile grafiği güncelle
+                        ikinciAjaxCagrisi(fkcihaz, tar1, tar2, tip);
+                    }
+
+
+                    // AJAX çağrısı ile verileri alıp grafiği güncelleme
+                    function ikinciAjaxCagrisi(fkcihaz, tar1, tar2, tip) {
+                        $.ajax({
+                            url: '/Home/GetCihazList2', // Controller'daki metodun URL'si
+                            type: 'GET',
+                            data: {
+                                fkcihaz: fkcihaz,
+                                tar1: tar1, // Başlangıç tarihi
+                                tar2: tar2, // Bitiş tarihi
+                                tip: tip
+                            },
+                            success: function (data) {
+                                if (data && data.length > 0) {
+                                    let seviyeData = [];
+                                    let labels = [];
+
+                                    // API'den dönen verileri işle
+                                    data.forEach(item => {
+                                        let realDataTime = convertJsonDate(item.Real_Data_Time); // Tarih formatını düzenle
+                                        labels.push(realDataTime); // Zaman etiketlerini ekle
+                                        seviyeData.push(item.Seviye !== null ? item.Seviye : NaN); // 'Seviye' verisini ekle
+                                    });
+
+                                    // Grafik verilerini güncelle
+                                    chartData.labels = labels;
+                                    chartData.datasets[2].data = seviyeData;
+
+                                    // Grafiği yeniden çiz
+                                    drawChart();
+                                } else {
+                                    console.log("No data returned.");
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('Error during AJAX call:', status, error);
+                                console.log('Error message:', xhr.responseText);
+                            }
+                        });
+                    }
+                });
+
+                // JSON tarih formatını çevirmek için fonksiyon
+                function convertJsonDate(jsonDate) {
+                    const timestamp = parseInt(jsonDate.replace("/Date(", "").replace(")/", ""), 10);
+                    const date = new Date(timestamp);
+                    const day = date.getDate().toString().padStart(2, '0');
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    const year = date.getFullYear();
+                    const hours = date.getHours().toString().padStart(2, '0');
+                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    const seconds = date.getSeconds().toString().padStart(2, '0');
+                    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+                }
+            </script>*@
+
+
+        @*<script>
+                let chart;
+                const chartData = {
+                    labels: [], // Zaman etiketleri buraya eklenecek
+                    datasets: [
+                        {
+                            label: 'Alarm 1',
+                            data: [], // Alarm 1 verileri buraya eklenecek
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                            fill: false
+                        },
+                        {
+                            label: 'Alarm 2',
+                            data: [], // Alarm 2 verileri buraya eklenecek
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            fill: false
+                        },
+                        {
+                            label: 'Seviye',
+                            data: [], // Seviye verileri buraya eklenecek
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: true
+                        }
+                    ]
+                };
+
+                function drawChart() {
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    if (chart) {
+                        chart.destroy(); // Önceki grafiği yok et
+                    }
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            spanGaps: true, // Eksik verilerde kesik çizgi oluşmasını sağlar
+                            scales: {
+                                x: {
+                                    type: 'time', // Zaman türünde olduğunu belirt
+                                    time: {
+                                        unit: 'minute', // Zaman birimi dakika olarak ayarlanır
+                                        tooltipFormat: 'YYYY-MM-DD HH:mm', // Tooltip formatı
+                                        displayFormats: {
+                                            minute: 'YYYY-MM-DD HH:mm' // X eksenindeki tarih formatı
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Time'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    min: 0,
+                                    ticks: {
+                                        stepSize: 100
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Value'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#ffffff'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                function convertJsonDate(jsonDate) {
+                    // Parantez içindeki sayıyı alıyoruz
+                    const timestamp = parseInt(jsonDate.replace("/Date(", "").replace(")/", ""), 10);
+                    const date = new Date(timestamp);
+
+                    // Tarihi sadece gün, ay, yıl formatında döndürüyoruz
+                    const day = date.getDate().toString().padStart(2, '0'); // Gün
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Ay (0 tabanlı olduğu için +1)
+                    const year = date.getFullYear(); // Yıl
+
+                    const hours = date.getHours().toString().padStart(2, '0'); // Saat
+                    const minutes = date.getMinutes().toString().padStart(2, '0'); // Dakika
+                    const seconds = date.getSeconds().toString().padStart(2, '0'); // Saniye
+
+                    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`; // İstediğiniz format
+                }
+
+                $(document).ready(function () {
+                    // Cihaz ID'si veya dinamik bir değer
+                    var viewBagId = document.getElementById("viewBagId").value;
+                    var fkcihaz = viewBagId;
+                    let tar1 = "2024-01-01"; // Başlangıç tarihi
+                    let tar2 = "2024-12-31"; // Bitiş tarihi
+                    let tip = 1; // Dinamik bir tip parametresi olabilir
+                    console.log(viewBagId);
+
+                    // İlk AJAX çağrısı: /Home/GetCihazDataInterval
+                    $.ajax({
+                        url: '/Home/GetCihazDataInterval2',
+                        type: 'GET',
+                        data: {
+                            id: fkcihaz
+                        },
+                        success: function (data) {
+                            console.log('Veri başarıyla alındı:', data);
+
+                            // Alarm1 ve Alarm2 verilerini çekme
+                            let alarm1Value = data.Alarm1; // Alarm1 değeri
+                            let alarm2Value = data.Alarm2; // Alarm2 değeri
+
+                            // Console'da yazdırma
+                            console.log('Alarm 1 Değeri:', alarm1Value);
+                            console.log('Alarm 2 Değeri:', alarm2Value);
+
+                            // Chart.js için verileri düzenleme
+                            chartData.datasets[0].data = [alarm1Value]; // Alarm 1 verisi
+                            chartData.datasets[1].data = [alarm2Value]; // Alarm 2 verisi
+
+                            // İkinci AJAX çağrısını tetikle
+                            ikinciAjaxCagrisi(fkcihaz, tar1, tar2, tip);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX çağrısı sırasında bir hata oluştu:', status, error);
+                            console.log('Hata mesajı:', xhr.responseText);
+                        }
+                    });
+
+                    // İkinci AJAX çağrısı: /Home/GetCihazList2
+                    function ikinciAjaxCagrisi(fkcihaz, tar1, tar2, tip) {
+                        $.ajax({
+                            url: '/Home/GetCihazList2', // C# metodunuza yönlendirin
+                            type: 'GET',
+                            data: {
+                                fkcihaz: fkcihaz,
+                                tar1: tar1,
+                                tar2: tar2,
+                                tip: tip
+                            },
+                            success: function (data) {
+                                console.log('Seviye verisi başarıyla alındı:', data);
+
+                                if (data && data.length > 0) {
+                                    // Chart.js için verileri düzenleme
+                                    let seviyeData = [];
+                                    let labels = [];
+
+                                    // Verileri döngüyle çek ve grafiğe uygun hale getir
+                                    data.forEach(item => {
+                                        let realDataTime = convertJsonDate(item.Real_Data_Time); // Tarih formatını dönüştür
+                                        labels.push(realDataTime); // Zaman etiketini ekle
+                                        seviyeData.push(item.Seviye !== null ? item.Seviye : NaN); // Seviye verisi, `null` ise `NaN` eklenir
+                                    });
+
+                                    chartData.labels = labels; // Zaman etiketlerini ekle
+                                    chartData.datasets[2].data = seviyeData; // Seviye verileri
+
+                                    // Grafiği çiz
+                                    drawChart();
+                                } else {
+                                    console.log("Boş veri döndü.");
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('İkinci AJAX çağrısı sırasında bir hata oluştu:', status, error);
+                                console.log('Hata mesajı:', xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            </script>*@
+
+
+        @*<script>
+                let chart;
+                const chartData = {
+                    labels: [], // Zaman etiketleri buraya eklenecek
+                    datasets: [
+                        {
+                            label: 'Alarm 1',
+                            data: [], // Alarm 1 verileri buraya eklenecek
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                            fill: false
+                        },
+                        {
+                            label: 'Alarm 2',
+                            data: [], // Alarm 2 verileri buraya eklenecek
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            fill: false
+                        },
+                        {
+                            label: 'Seviye',
+                            data: [], // Seviye verileri buraya eklenecek
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: true
+                        }
+                    ]
+                };
+
+                function drawChart() {
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    if (chart) {
+                        chart.destroy(); // Önceki grafiği yok et
+                    }
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    type: 'time', // Zaman türünde olduğunu belirt
+                                    time: {
+                                        unit: 'minute', // Zaman birimi dakika olarak ayarlanır
+                                        tooltipFormat: 'YYYY-MM-DD HH:mm', // Tooltip formatı
+                                        displayFormats: {
+                                            minute: 'YYYY-MM-DD HH:mm' // X eksenindeki tarih formatı
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Time'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    min: 0,
+                                    ticks: {
+                                        stepSize: 100
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Value'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#ffffff'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                function convertJsonDate(jsonDate) {
+                    // Parantez içindeki sayıyı alıyoruz
+                    const timestamp = parseInt(jsonDate.replace("/Date(", "").replace(")/", ""), 10);
+                    const date = new Date(timestamp);
+
+                    // Tarihi sadece gün, ay, yıl formatında döndürüyoruz
+                    const day = date.getDate().toString().padStart(2, '0'); // Gün
+                    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Ay (0 tabanlı olduğu için +1)
+                    const year = date.getFullYear(); // Yıl
+
+                    const hours = date.getHours().toString().padStart(2, '0'); // Saat
+                    const minutes = date.getMinutes().toString().padStart(2, '0'); // Dakika
+                    const seconds = date.getSeconds().toString().padStart(2, '0'); // Saniye
+
+                    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`; // İstediğiniz format
+                }
+
+                $(document).ready(function () {
+                    // Cihaz ID'si veya dinamik bir değer
+                    var viewBagId = document.getElementById("viewBagId").value;
+                    var fkcihaz = viewBagId;
+                    let tar1 = "2024-01-01"; // Başlangıç tarihi
+                    let tar2 = "2024-12-31"; // Bitiş tarihi
+                    let tip = 1; // Dinamik bir tip parametresi olabilir
+                    console.log(viewBagId);
+                    // İlk AJAX çağrısı: /Home/GetCihazDataInterval
+                    $.ajax({
+                        url: '/Home/GetCihazDataInterval2',
+                        type: 'GET',
+                        data: {
+                            id: fkcihaz
+                        },
+                        success: function (data) {
+
+                            console.log('Veri başarıyla alındı:', data);
+                            // Alarm1 ve Alarm2 verilerini çekme
+                            let alarm1Value = data[0].Alarm1; // Alarm1 değeri
+                            let alarm2Value = data[0].Alarm2; // Alarm2 değeri
+
+                            // Console'da yazdırma
+                            console.log('Alarm 1 Değeri:', alarm1Value);
+                            console.log('Alarm 2 Değeri:', alarm2Value);
+
+                            // Chart.js için verileri düzenleme
+                            chartData.datasets[0].data = [alarm1Value]; // Alarm 1 verisi
+                            chartData.datasets[1].data = [alarm2Value]; // Alarm 2 verisi
+
+                            // İkinci AJAX çağrısını tetikle
+                            ikinciAjaxCagrisi(fkcihaz, tar1, tar2, tip);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX çağrısı sırasında bir hata oluştu:', status, error);
+                            console.log('Hata mesajı:', xhr.responseText);
+                        }
+                    });
+
+                    // İkinci AJAX çağrısı: /Home/GetCihazList2
+                    function ikinciAjaxCagrisi(fkcihaz, tar1, tar2, tip) {
+                        $.ajax({
+                            url: '/Home/GetCihazList2', // C# metodunuza yönlendirin
+                            type: 'GET',
+                            data: {
+                                fkcihaz: fkcihaz,
+                                tar1: tar1,
+                                tar2: tar2,
+                                tip: tip
+                            },
+                            success: function (data) {
+                                console.log('Seviye verisi başarıyla alındı:', data);
+
+                                if (data && data.length > 0) {
+                                    // Chart.js için verileri düzenleme
+                                    let seviyeData = [];
+                                    let labels = [];
+
+                                    // Verileri döngüyle çek ve grafiğe uygun hale getir
+                                    data.forEach(item => {
+                                        let realDataTime = convertJsonDate(item.Real_Data_Time); // Tarih formatını dönüştür
+                                        labels.push(realDataTime); // Zaman etiketini ekle
+                                        seviyeData.push(item.Seviye); // Seviye verisi
+                                    });
+
+
+                                    chartData.labels = labels; // Zaman etiketlerini ekle
+                                    chartData.datasets[2].data = seviyeData; // Seviye verileri
+
+                                    // Grafiği çiz
+                                    drawChart();
+                                } else {
+                                    console.log("Boş veri döndü.");
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error('İkinci AJAX çağrısı sırasında bir hata oluştu:', status, error);
+                                console.log('Hata mesajı:', xhr.responseText);
+                            }
+                        });
+                    }
+                });
+            </script>*@
+
+        @*<script>
+                $(document).ready(function () {
+                    let id = 2004; // veya dinamik bir değer
+                    $.ajax({
+                        url: '/Home/GetCihazDataInterval',
+                        type: 'GET',
+                        data: { id: id },
+                        success: function (data) {
+                            console.log('Veri başarıyla alındı:', data);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('AJAX çağrısı sırasında bir hata oluştu:', status, error);
+                            console.log('Hata mesajı:', xhr.responseText);
+                        }
+                    });
+                });
+            </script>*@
+        <script>
+            if (typeof ApexCharts !== 'undefined') {
+                ApexCharts.exec("apexchartsesqsi2ua", "destroy");
+            }
+
+            //// Grafik oluşturulacak div'i seçin
+            //var existingChart = document.querySelector("#currentchar .apexcharts-canvas");
+
+            //if (!existingChart) {
+            //    // Eğer grafik yoksa, yeni grafik oluşturun
+            //    var chart = new ApexCharts(document.querySelector("#currentchar"), options);
+            //    chart.render();
+            //} else {
+            //    // Eğer existingChart varsa, yeni grafik oluşturmayı engelle
+            //    console.log("Grafik zaten mevcut, yeni grafik oluşturulmayacak.");
+            //}
+
+
+        </script>
+        @*<script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        // SVG içeriğini tanımla
+                        var svgContent = `
+            <svg id="SvgjsSvg1372" width="306" height="201.1630859375" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:svgjs="http://svgjs.com/svgjs" class="apexcharts-svg" xmlns:data="ApexChartsNS" transform="translate(0, 0)" style="background: transparent;">
+                <g id="SvgjsG1374" class="apexcharts-inner apexcharts-graphical" transform="translate(8.5, 0)">
+                    <defs id="SvgjsDefs1373">
+                        <clipPath id="gridRectMaskdy5s6a6e">
+                            <rect id="SvgjsRect1376" width="297" height="315" x="-3" y="-1" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect>
+                        </clipPath>
+                        <clipPath id="gridRectMarkerMaskdy5s6a6e">
+                            <rect id="SvgjsRect1377" width="295" height="317" x="-2" y="-2" rx="0" ry="0" opacity="1" stroke-width="0" stroke="none" stroke-dasharray="0" fill="#fff"></rect>
+                        </clipPath>
+                    </defs>
+                    <g id="SvgjsG1378" class="apexcharts-radialbar">
+                        <g id="SvgjsG1379">
+                            <g id="SvgjsG1380" class="apexcharts-tracks">
+                                <g id="SvgjsG1381" class="apexcharts-radialbar-track apexcharts-track" rel="1">
+                                    <path id="apexcharts-radialbarTrack-0" d="M 27.441463414634143 145.49999999999997 A 118.05853658536586 118.05853658536586 0 0 1 263.55853658536586 145.5" fill="none" fill-opacity="1" stroke="rgba(242,242,242,0.85)" stroke-opacity="1" stroke-linecap="round" stroke-width="8.337268292682928" stroke-dasharray="0" class="apexcharts-radialbar-area" data:pathOrig="M 27.441463414634143 145.49999999999997 A 118.05853658536586 118.05853658536586 0 0 1 263.55853658536586 145.5"></path>
+                                </g>
+                                <!-- Diğer track elementleri de buraya eklenecek -->
+                            </g>
+                            <g id="SvgjsG1389">
+                                <!-- Dinamik veri ile güncellenecek grafik elementleri buraya eklenecek -->
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+            `;
+
+                        // Eğer SVG daha önce eklenmemişse sayfaya ekle
+                        if (!document.getElementById('SvgjsSvg1372')) {
+                            document.getElementById('chartContainer').innerHTML = svgContent;
+                        }
+
+                        // Dinamik veri güncelleme fonksiyonu
+                        function updateChart(data) {
+                            // Örneğin, bir path öğesini güncelle
+                            var pathElement = document.getElementById('apexcharts-radialbarTrack-0');
+                            pathElement.setAttribute('stroke', data.color);
+                            pathElement.setAttribute('data:value', data.value);
+                        }
+
+                        // Örnek veri ile grafiği güncelle
+                        var exampleData = { color: 'rgba(236,129,83,0.85)', value: 85 };
+                        updateChart(exampleData);
+                    });
+
+                </script>*@
+
+        @*<script>
+                let chart;
+                const chartData = {
+                    labels: [], // Başlangıçta boş
+                    datasets: []
+                };
+
+                function drawChart() {
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    if (chart) {
+                        chart.destroy(); // Önceki grafiği yok et
+                    }
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'minute',
+                                        displayFormats: {
+                                            minute: 'YYYY-MM-DD HH:mm'
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Time'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    min: 0,
+                                    ticks: {
+                                        stepSize: 100
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Value'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#ffffff'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                function fetchData() {
+                    const startDateTime = `${document.getElementById("datePickerStart").value} ${document.getElementById("timePickerStart").value}`;
+                    const endDateTime = `${document.getElementById("datePickerEnd").value} ${document.getElementById("timePickerEnd").value}`;
+                  const id = 2004;
+
+                    $.ajax({
+                        url: '/Home/GetCihazDataInterval',
+                        type: 'GET',
+                        data: { id: id, tar1: startDateTime, tar2: endDateTime },
+                        success: function (data) {
+                            chartData.labels = data.map(item => item.Real_Data_Time);
+                            chartData.datasets = [
+                                {
+                                    label: 'Alarm 1',
+                                    data: data.map(item => item.Alarm1Value || 0), // API'den gelen değerler
+                                    borderColor: 'rgba(255, 206, 86, 1)',
+                                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                                    fill: false,
+                                },
+                                {
+                                    label: 'Alarm 2',
+                                    data: data.map(item => item.Alarm2Value || 0), // API'den gelen değerler
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    fill: false,
+                                }
+                            ];
+
+                            drawChart(); // Grafiği güncelle
+                        },
+                        error: function (error) {
+                            console.error('Veri alınırken bir hata oluştu:', error);
+                        }
+                    });
+                }
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    drawChart(); // İlk grafiği çizer
+                    document.getElementById("fetchData").addEventListener("click", fetchData); // Veri çekme butonuna olay ekle
+                });
+
+
+            </script>*@
+
+        @*<script>
+                let chart;
+                const chartData = {
+                    labels: [], // Tarih ve saat bilgileri
+                    datasets: []
+                };
+
+                document.addEventListener("DOMContentLoaded", function () {
+                    var startDatePicker = flatpickr("#datePickerStart", {
+                        dateFormat: "Y-m-d",
+                        defaultDate: "today",
+                        onChange: function (selectedDates, dateStr, instance) {
+                            endDatePicker.set('minDate', dateStr);
+                        }
+                    });
+
+                    var startTimePicker = flatpickr("#timePickerStart", {
+                        enableTime: true,
+                        noCalendar: true,
+                        dateFormat: "H:i",
+                        time_24hr: true,
+                        onChange: function (selectedDates, dateStr, instance) {
+                            endTimePicker.set('minTime', dateStr);
+                        }
+                    });
+
+                    var endDatePicker = flatpickr("#datePickerEnd", {
+                        dateFormat: "Y-m-d",
+                        defaultDate: "today",
+                    });
+
+                    var endTimePicker = flatpickr("#timePickerEnd", {
+                        enableTime: true,
+                        noCalendar: true,
+                        dateFormat: "H:i",
+                        time_24hr: true
+                    });
+
+                    document.getElementById("fetchData").addEventListener("click", fetchData);
+                });
+
+                function fetchData() {
+                    const startDate = document.getElementById("datePickerStart").value;
+                    const startTime = document.getElementById("timePickerStart").value;
+                    const endDate = document.getElementById("datePickerEnd").value;
+                    const endTime = document.getElementById("timePickerEnd").value;
+
+                    const startDateTime = `${startDate} ${startTime}`;
+                    const endDateTime = `${endDate} ${endTime}`;
+
+                    // jQuery AJAX kullanarak HomeController'daki GetData metodunu çağır
+                    $.ajax({
+                        url: '/Home/GetCihazDataInterval',
+                        type: 'GET',
+                        data: { start: startDateTime, end: endDateTime },
+                        success: function (data) {
+                            // Chart.js için verileri düzenleme
+                            chartData.labels = data.map(item => item.Real_Data_Time); // Tarih verileri
+                            chartData.datasets = [
+                                {
+                                    label: 'Alarm 1',
+                                    data: data.map(item => item.Alarm1Value), // API'den gelen alarm 1 değerleri
+                                    borderColor: 'rgba(255, 206, 86, 1)',
+                                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                                    fill: false,
+                                    hidden: false
+                                },
+                                {
+                                    label: 'Alarm 2',
+                                    data: data.map(item => item.Alarm2Value), // API'den gelen alarm 2 değerleri
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    fill: false,
+                                    hidden: false
+                                }
+                            ];
+
+                            // Grafiği çiz
+                            drawChart();
+                        },
+                        error: function (error) {
+                            console.error('Veri alınırken bir hata oluştu:', error);
+                        }
+                    });
+                }
+
+                function drawChart() {
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    if (chart) {
+                        chart.destroy(); // Önceki grafiği yok et
+                    }
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'minute',
+                                        displayFormats: {
+                                            minute: 'YYYY-MM-DD HH:mm'
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Zaman'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Seviye'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#000'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            </script>*@
+
+        @*<script>
+                let chart;
+                const chartData = {
+                    labels: [
+                        '2023-07-01 12:00', '2023-07-01 12:05', '2023-07-01 12:10', '2023-07-01 12:15', '2023-07-01 12:20',
+                        '2023-07-01 12:25', '2023-07-01 12:30', '2023-07-01 12:35', '2023-07-01 12:40', '2023-07-01 12:45'
+                    ], // Tarih ve saat bilgileri
+                    datasets: [
+
+                    ]
+                };
+                function fetchData() {
+
+                    // jQuery AJAX kullanarak HomeController'daki GetData metodunu çağır
+                    $.ajax({
+                        url: '/Home/GetCihazDataInterval',
+                        type: 'GET',
+                        data: { id: id },
+                        success: function (data) {
+                            // Chart.js için verileri düzenleme
+                            chartData.labels = data.map(item => item.Real_Data_Time); // Tarih verileri
+                            chartData.datasets = [
+                                {
+                                    label: 'Alarm 1',
+                                    data: data.map(item => item.Alarm1), // API'den gelen alarm 1 değerleri
+                                    borderColor: 'rgba(255, 206, 86, 1)',
+                                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                                    fill: false,
+                                    hidden: false
+                                },
+                                {
+                                    label: 'Alarm 2',
+                                    data: data.map(item => item.Alarm2), // API'den gelen alarm 2 değerleri
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                    fill: false,
+                                    hidden: false
+                                }
+                            ];
+
+                            // Grafiği çiz
+                            drawChart();
+                        },
+                        error: function (error) {
+                            console.error('Veri alınırken bir hata oluştu:', error);
+                        }
+                    });
+                }
+                function drawChart() {
+                    const ctx = document.getElementById('myChart').getContext('2d');
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'minute',
+                                        displayFormats: {
+                                            minute: 'YYYY-MM-DD HH:mm'
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Time'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    min: 0,
+                                    ticks: {
+                                        stepSize: 100
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Value'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    labels: {
+                                        color: '#ffffff'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                function updateChart() {
+                    chartData.datasets.forEach((dataset, index) => {
+                        const checkbox = document.getElementById(`Alarm${index + 1}`);
+                        dataset.hidden = !checkbox.checked;
+                    });
+                    chart.update();
+                }
+
+                document.addEventListener('DOMContentLoaded', drawChart);
+            </script>*@
+        @*<script>
+                function goBack() {
+                    window.history.back();
+                }
+
+                document.addEventListener("DOMContentLoaded", function () {
+                    var startDatePicker = flatpickr("#datePickerStart", {
+                        dateFormat: "Y-m-d",
+                        defaultDate: "today",
+                        onChange: function (selectedDates, dateStr, instance) {
+                            endDatePicker.set('minDate', dateStr);
+                        }
+                    });
+
+                    var startTimePicker = flatpickr("#timePickerStart", {
+                        enableTime: true,
+                        noCalendar: true,
+                        dateFormat: "H:i",
+                        time_24hr: true,
+                        onChange: function (selectedDates, dateStr, instance) {
+                            endTimePicker.set('minTime', dateStr);
+                        }
+                    });
+
+                    var endDatePicker = flatpickr("#datePickerEnd", {
+                        dateFormat: "Y-m-d",
+                        defaultDate: "today",
+                    });
+
+                    var endTimePicker = flatpickr("#timePickerEnd", {
+                        enableTime: true,
+                        noCalendar: true,
+                        dateFormat: "H:i",
+                        time_24hr: true
+                    });
+                });
+            </script>*@
+
+        @*apexchart veri*@
+        <script>
+            // AJAX ile veri çekme işlemi
+            function fetchData(fkcihaz, tar1, tar2) {
+                $.ajax({
+                    url: '/Home/GetCihazMaxMin', // Controller'daki metodun URL'si
+                    type: 'GET',
+                    data: {
+                        id: fkcihaz,
+                        tar1: tar1, // Başlangıç tarihi
+                        tar2: tar2 // Bitiş tarihi
+                    },
+
+                    success: function (data) {
+                        // Veriyi alıp grafiği oluşturma
+                        console.log(data);
+                        if (data.length > 0) {
+                            $('#cihazmaxi').text(data[0].maxi);
+                            $('#cihazmini').text(data[0].mini);
+                            $('#cihazort').text(data[0].ort);
+                        } else {
+                            // Eğer veri yoksa, uygun bir mesaj gösterebilirsiniz
+                            $('#cihazmaxi').text('N/A');
+                            $('#cihazmini').text('N/A');
+                            $('#cihazort').text('N/A');
+                        }
+                        var options = {
+                            chart: {
+                                height: 350,
+                                type: 'radialBar',
+                            },
+                            series: [parseFloat(data.mini), parseFloat(data.max), parseFloat(data.ort)],
+                            labels: ['Max', 'Min', 'Mak. Ort'],
+                            colors: ['#EB8153', '#71B945', '#4A8CDA'],
+                            plotOptions: {
+                                radialBar: {
+                                    dataLabels: {
+                                        total: {
+                                            show: true,
+                                            label: 'Toplam',
+                                            formatter: function (w) {
+                                                // Toplamı API'den hesaplayarak döndür
+                                                return data.toplamDeger;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        };
+
+                        // Chart oluşturuluyor
+                        var chart = new ApexCharts(document.querySelector("#chart"), options);
+                        chart.render();
+                    },
+                    error: function (error) {
+                        console.error('Veri çekme hatası:', error);
+                    }
+                });
+            }
+
+
+        </script>
+
+
+        @*burası kontrollerdan veri alırsan*@
+        @*<script>
+                $(document).ready(function () {
+                    $.ajax({
+                        url: '/Home/GetChartData',
+                        type: 'GET',
+                        success: function (data) {
+                            // Gelen JSON veriyi grafiklerde kullan
+                            $('#income1').text('$' + data.Income1);
+                            $('#income2').text('$' + data.Income2);
+                            $('#income3').text('$' + data.Income3);
+                            $('#income4').text('$' + data.Income4);
+
+                            // ApexCharts ile güncelleme işlemi yapılabilir
+                            updateChart(data);
+                        },
+                        error: function (error) {
+                            console.log('Error:', error);
+                        }
+                    });
+                });
+
+                function updateChart(data) {
+                    var options = {
+                        series: [data.Income1, data.Income2, data.Income3, data.Income4],
+                        chart: {
+                            type: 'radialBar',
+                        },
+                        labels: ['Income 1', 'Income 2', 'Income 3', 'Income 4']
+                    };
+
+                    var chart = new ApexCharts(document.querySelector("#chart"), options);
+                    chart.render();
+                }
+            </script>*@
+        @*<script>
+                var options = {
+                    series: [47, 8, 45],
+                    chart: {
+                        height: 350,
+                        type: 'radialBar',
+                        offsetY: -20,
+                        sparkline: {
+                            enabled: true
+                        }
+                    },
+                    plotOptions: {
+                        radialBar: {
+                            startAngle: -90,
+                            endAngle: 90,
+                            hollow: {
+                                margin: 15,
+                                size: '70%',
+                                background: 'transparent',
+                                image: undefined,
+                            },
+                            track: {
+                                background: '#333',
+                                strokeWidth: '97%',
+                                margin: 5, // margin is in pixels
+                                dropShadow: {
+                                    enabled: true,
+                                    top: 2,
+                                    left: 0,
+                                    blur: 4,
+                                    opacity: 0.15
+                                }
+                            },
+                            dataLabels: {
+                                name: {
+                                    show: true,
+                                    fontSize: '16px',
+                                    color: '#fff',
+                                    offsetY: -10
+                                },
+                                value: {
+                                    show: true,
+                                    fontSize: '14px',
+                                    color: '#fff',
+                                    offsetY: 10,
+                                }
+                            }
+                        }
+                    },
+                    fill: {
+                        colors: ['#eb4034', '#29a329', '#f7d434'],
+                    },
+                    labels: ['510 cm', '400 cm', '300 cm'],
+                    legend: {
+                        show: true,
+                        floating: true,
+                        fontSize: '16px',
+                        position: 'left',
+                        offsetX: 160,
+                        offsetY: 15,
+                        labels: {
+                            useSeriesColors: true,
+                        },
+                        markers: {
+                            size: 0
+                        },
+                        formatter: function (seriesName, opts) {
+                            return seriesName + ":  " + opts.w.globals.series[opts.seriesIndex]
+                        },
+                        itemMargin: {
+                            vertical: 3
+                        }
+                    },
+                    responsive: [{
+                        breakpoint: 480,
+                        options: {
+                            legend: {
+                                show: false
+                            }
+                        }
+                    }]
+                };
+
+                var chart = new ApexCharts(document.querySelector("#chart"), options);
+                chart.render();
+            </script>*@
+        <script>
+            function updateBattery(signalStrength) {
+                const batteryItems = document.querySelectorAll('.battery_item');
+                const itemsToFill = Math.ceil(signalStrength / 20);
+
+                batteryItems.forEach((item, index) => {
+                    if (index < itemsToFill) {
+                        item.classList.add('filled');
+                    } else {
+                        item.classList.remove('filled');
+                    }
+                });
+
+                document.getElementById('signalStrength').textContent = `%${signalStrength}`;
+            }
+
+            // Example usage
+            updateBattery(39); // Update the battery with 39% signal strength
+        </script>
+        @*<script>
+                var options = {
+                    series: [4.7, 0.8, 4.5],
+                    chart: {
+                        height: 350,
+                        type: 'radialBar',
+                    },
+                    plotOptions: {
+                        radialBar: {
+                            hollow: {
+                                size: '70%',
+                            },
+                            track: {
+                                show: true,
+                                background: '#333',
+                            },
+                            dataLabels: {
+                                show: true,
+                                name: {
+                                    show: true,
+                                    fontSize: '16px',
+                                    color: '#fff',
+                                    offsetY: -10
+                                },
+                                value: {
+                                    show: true,
+                                    fontSize: '14px',
+                                    color: '#fff',
+                                    offsetY: 10,
+                                }
+                            }
+                        },
+                    },
+                    fill: {
+                        colors: ['#eb4034', '#29a329', '#f7d434'],
+                    },
+                    labels: ['510 cm', '400 cm', '300 cm'],
+                };
+
+                var chart = new ApexCharts(document.querySelector("#chart"), options);
+                chart.render();
+            </script>*@
+        <!--**********************************
+            Scripts
+        ***********************************-->
+        <!-- Required vendors -->
+        <script data-cfasync="false" src="../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+        <script src="~/vendor/global/global.min.js"></script>
+        <script src="~/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+        <script src="~/vendor/chart.js/Chart.bundle.min.js"></script>
+        <!-- Apex Chart -->
+        <script src="~/vendor/apexchart/apexchart.js"></script>
+
+        <!-- Chartist -->
+        <script src="~/vendor/chartist/js/chartist.min.js"></script>
+        <script src="~/vendor/chartist-plugin-tooltips/js/chartist-plugin-tooltip.min.js"></script>
+
+        <!-- Flot -->
+        <script src="~/vendor/flot/jquery.flot.js"></script>
+        <script src="~/vendor/flot/jquery.flot.pie.js"></script>
+        <script src="~/vendor/flot/jquery.flot.resize.js"></script>
+        <script src="~/vendor/flot-spline/jquery.flot.spline.min.js"></script>
+
+        <!-- Chart sparkline plugin files -->
+        <script src="~/vendor/jquery-sparkline/jquery.sparkline.min.js"></script>
+        <script src="~/js/plugins-init/sparkline-init.js"></script>
+
+        <!-- Chart piety plugin files -->
+        <script src="~/vendor/peity/jquery.peity.min.js"></script>
+        <script src="~/js/plugins-init/piety-init.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://code.jquery.com/jquery-2.1.4.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/semantic-ui-calendar@0.0.8/dist/calendar.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui-calendar@0.0.8/dist/calendar.min.css">
+        Custom Stylesheet
+        <link href="~/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
+        <link href="~/css/style.css" rel="stylesheet">
+
+        <script src="~/vendor/global/global.min.js"></script>
+        <script src="~/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+        <script src="~/vendor/chart.js/Chart.bundle.min.js"></script>
+        <script src="~/vendor/owl-carousel/owl.carousel.js"></script>
+        <script src="~/js/custom.min.js"></script>
+        <script src="~/js/plugins-init/select2-init.js"></script>
+        <script src="~/vendor/global/global.min.js"></script>
+
+    }
+</main>
+

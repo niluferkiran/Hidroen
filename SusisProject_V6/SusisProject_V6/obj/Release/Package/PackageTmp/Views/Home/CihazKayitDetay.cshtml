@@ -1,0 +1,1396 @@
+﻿
+@{
+    ViewBag.Title = "CihazKayitDetay";
+}
+
+
+
+@model SusisProject_V6.Controllers.HomeController.CihazKayitViewModel
+
+
+
+<style>
+    .select2-container {
+        box-sizing: border-box;
+        display: inline-block;
+        margin: 0;
+        position: relative;
+        vertical-align: middle
+    }
+
+        .select2-container .select2-selection--single {
+            box-sizing: border-box;
+            cursor: pointer;
+            display: block;
+            height: 28px;
+            user-select: none;
+            -webkit-user-select: none
+        }
+
+            .select2-container .select2-selection--single .select2-selection__rendered {
+                display: block;
+                padding-left: 8px;
+                padding-right: 20px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap
+            }
+
+            .select2-container .select2-selection--single .select2-selection__clear {
+                position: relative
+            }
+
+        .select2-container[dir="rtl"] .select2-selection--single .select2-selection__rendered {
+            padding-right: 8px;
+            padding-left: 20px
+        }
+
+        .select2-container .select2-selection--multiple {
+            box-sizing: border-box;
+            cursor: pointer;
+            display: block;
+            min-height: 32px;
+            user-select: none;
+            -webkit-user-select: none
+        }
+
+            .select2-container .select2-selection--multiple .select2-selection__rendered {
+                display: inline-block;
+                overflow: hidden;
+                padding-left: 8px;
+                text-overflow: ellipsis;
+                white-space: nowrap
+            }
+
+        .select2-container .select2-search--inline {
+            float: left
+        }
+
+            .select2-container .select2-search--inline .select2-search__field {
+                box-sizing: border-box;
+                border: none;
+                font-size: 100%;
+                margin-top: 5px;
+                padding: 0
+            }
+
+                .select2-container .select2-search--inline .select2-search__field::-webkit-search-cancel-button {
+                    -webkit-appearance: none
+                }
+
+    .select2-dropdown {
+        background-color: white;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        box-sizing: border-box;
+        display: block;
+        position: absolute;
+        left: -100000px;
+        width: 100%;
+        z-index: 1051
+    }
+
+    .select2-results {
+        display: block
+    }
+
+    .select2-results__options {
+        list-style: none;
+        margin: 0;
+        padding: 0
+    }
+
+    .select2-results__option {
+        padding: 6px;
+        user-select: none;
+        -webkit-user-select: none
+    }
+
+        .select2-results__option[aria-selected] {
+            cursor: pointer
+        }
+
+    .select2-container--open .select2-dropdown {
+        left: 0
+    }
+
+    .select2-container--open .select2-dropdown--above {
+        border-bottom: none;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0
+    }
+
+    .select2-container--open .select2-dropdown--below {
+        border-top: none;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0
+    }
+
+    .select2-search--dropdown {
+        display: block;
+        padding: 4px
+    }
+
+        .select2-search--dropdown .select2-search__field {
+            padding: 4px;
+            width: 100%;
+            box-sizing: border-box
+        }
+
+            .select2-search--dropdown .select2-search__field::-webkit-search-cancel-button {
+                -webkit-appearance: none
+            }
+
+        .select2-search--dropdown.select2-search--hide {
+            display: none
+        }
+
+    .select2-close-mask {
+        border: 0;
+        margin: 0;
+        padding: 0;
+        display: block;
+        position: fixed;
+        left: 0;
+        top: 0;
+        min-height: 100%;
+        min-width: 100%;
+        height: auto;
+        width: auto;
+        opacity: 0;
+        z-index: 99;
+        background-color: #fff;
+        filter: alpha(opacity=0)
+    }
+
+    .select2-hidden-accessible {
+        border: 0 !important;
+        clip: rect(0 0 0 0) !important;
+        -webkit-clip-path: inset(50%) !important;
+        clip-path: inset(50%) !important;
+        height: 1px !important;
+        overflow: hidden !important;
+        padding: 0 !important;
+        position: absolute !important;
+        width: 1px !important;
+        white-space: nowrap !important
+    }
+
+    .select2-container--default .select2-selection--single {
+        background-color: #fff;
+        border: 1px solid #aaa;
+        border-radius: 4px
+    }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #cbb7b7; /*burayı değiştirdim*/
+            line-height: 28px
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__clear {
+            cursor: pointer;
+            float: right;
+            font-weight: bold
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__placeholder {
+            color: #999
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 26px;
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            width: 20px
+        }
+
+            .select2-container--default .select2-selection--single .select2-selection__arrow b {
+                border-color: #888 transparent transparent transparent;
+                border-style: solid;
+                border-width: 5px 4px 0 4px;
+                height: 0;
+                left: 50%;
+                margin-left: -4px;
+                margin-top: -2px;
+                position: absolute;
+                top: 50%;
+                width: 0
+            }
+
+    .select2-container--default[dir="rtl"] .select2-selection--single .select2-selection__clear {
+        float: left
+    }
+
+    .select2-container--default[dir="rtl"] .select2-selection--single .select2-selection__arrow {
+        left: 1px;
+        right: auto
+    }
+
+    .select2-container--default.select2-container--disabled .select2-selection--single {
+        background-color: #eee;
+        cursor: default
+    }
+
+        .select2-container--default.select2-container--disabled .select2-selection--single .select2-selection__clear {
+            display: none
+        }
+
+    .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+        border-color: transparent transparent #888 transparent;
+        border-width: 0 4px 5px 4px
+    }
+
+    .select2-container--default .select2-selection--multiple {
+        background-color: white;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        cursor: text
+    }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            box-sizing: border-box;
+            list-style: none;
+            margin: 0;
+            padding: 0 5px;
+            width: 100%
+        }
+
+            .select2-container--default .select2-selection--multiple .select2-selection__rendered li {
+                list-style: none
+            }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__placeholder {
+            color: #999;
+            margin-top: 5px;
+            float: left
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__clear {
+            cursor: pointer;
+            float: right;
+            font-weight: bold;
+            margin-top: 5px;
+            margin-right: 10px
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #e4e4e4;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            cursor: default;
+            float: left;
+            margin-right: 5px;
+            margin-top: 5px;
+            padding: 0 5px
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #999;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: bold;
+            margin-right: 2px
+        }
+
+            .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+                color: #333
+            }
+
+    .select2-container--default[dir="rtl"] .select2-selection--multiple .select2-selection__choice, .select2-container--default[dir="rtl"] .select2-selection--multiple .select2-selection__placeholder, .select2-container--default[dir="rtl"] .select2-selection--multiple .select2-search--inline {
+        float: right
+    }
+
+    .select2-container--default[dir="rtl"] .select2-selection--multiple .select2-selection__choice {
+        margin-left: 5px;
+        margin-right: auto
+    }
+
+    .select2-container--default[dir="rtl"] .select2-selection--multiple .select2-selection__choice__remove {
+        margin-left: 2px;
+        margin-right: auto
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border: solid black 1px;
+        outline: 0
+    }
+
+    .select2-container--default.select2-container--disabled .select2-selection--multiple {
+        background-color: #eee;
+        cursor: default
+    }
+
+    .select2-container--default.select2-container--disabled .select2-selection__choice__remove {
+        display: none
+    }
+
+    .select2-container--default.select2-container--open.select2-container--above .select2-selection--single, .select2-container--default.select2-container--open.select2-container--above .select2-selection--multiple {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0
+    }
+
+    .select2-container--default.select2-container--open.select2-container--below .select2-selection--single, .select2-container--default.select2-container--open.select2-container--below .select2-selection--multiple {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0
+    }
+
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        border: 1px solid #aaa
+    }
+
+    .select2-container--default .select2-search--inline .select2-search__field {
+        background: transparent;
+        border: none;
+        outline: 0;
+        box-shadow: none;
+        -webkit-appearance: textfield
+    }
+
+    .select2-container--default .select2-results > .select2-results__options {
+        max-height: 200px;
+        overflow-y: auto
+    }
+
+    .select2-container--default .select2-results__option[role=group] {
+        padding: 0
+    }
+
+    .select2-container--default .select2-results__option[aria-disabled=true] {
+        color: #999
+    }
+
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: #ddd
+    }
+
+    .select2-container--default .select2-results__option .select2-results__option {
+        padding-left: 1em
+    }
+
+        .select2-container--default .select2-results__option .select2-results__option .select2-results__group {
+            padding-left: 0
+        }
+
+        .select2-container--default .select2-results__option .select2-results__option .select2-results__option {
+            margin-left: -1em;
+            padding-left: 2em
+        }
+
+            .select2-container--default .select2-results__option .select2-results__option .select2-results__option .select2-results__option {
+                margin-left: -2em;
+                padding-left: 3em
+            }
+
+                .select2-container--default .select2-results__option .select2-results__option .select2-results__option .select2-results__option .select2-results__option {
+                    margin-left: -3em;
+                    padding-left: 4em
+                }
+
+                    .select2-container--default .select2-results__option .select2-results__option .select2-results__option .select2-results__option .select2-results__option .select2-results__option {
+                        margin-left: -4em;
+                        padding-left: 5em
+                    }
+
+                        .select2-container--default .select2-results__option .select2-results__option .select2-results__option .select2-results__option .select2-results__option .select2-results__option .select2-results__option {
+                            margin-left: -5em;
+                            padding-left: 6em
+                        }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #5897fb;
+        color: white
+    }
+
+    .select2-container--default .select2-results__group {
+        cursor: default;
+        display: block;
+        padding: 6px
+    }
+
+    .select2-container--classic .select2-selection--single {
+        background-color: #f7f7f7;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        outline: 0;
+        background-image: -webkit-linear-gradient(top, #fff 50%, #eee 100%);
+        background-image: -o-linear-gradient(top, #fff 50%, #eee 100%);
+        background-image: linear-gradient(to bottom, #fff 50%, #eee 100%);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFFFF', endColorstr='#FFEEEEEE', GradientType=0)
+    }
+
+        .select2-container--classic .select2-selection--single:focus {
+            border: 1px solid #5897fb
+        }
+
+        .select2-container--classic .select2-selection--single .select2-selection__rendered {
+            color: #444;
+            line-height: 28px
+        }
+
+        .select2-container--classic .select2-selection--single .select2-selection__clear {
+            cursor: pointer;
+            float: right;
+            font-weight: bold;
+            margin-right: 10px
+        }
+
+        .select2-container--classic .select2-selection--single .select2-selection__placeholder {
+            color: #999
+        }
+
+        .select2-container--classic .select2-selection--single .select2-selection__arrow {
+            background-color: #ddd;
+            border: none;
+            border-left: 1px solid #aaa;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            height: 26px;
+            position: absolute;
+            top: 1px;
+            right: 1px;
+            width: 20px;
+            background-image: -webkit-linear-gradient(top, #eee 50%, #ccc 100%);
+            background-image: -o-linear-gradient(top, #eee 50%, #ccc 100%);
+            background-image: linear-gradient(to bottom, #eee 50%, #ccc 100%);
+            background-repeat: repeat-x;
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFEEEEEE', endColorstr='#FFCCCCCC', GradientType=0)
+        }
+
+            .select2-container--classic .select2-selection--single .select2-selection__arrow b {
+                border-color: #888 transparent transparent transparent;
+                border-style: solid;
+                border-width: 5px 4px 0 4px;
+                height: 0;
+                left: 50%;
+                margin-left: -4px;
+                margin-top: -2px;
+                position: absolute;
+                top: 50%;
+                width: 0
+            }
+
+    .select2-container--classic[dir="rtl"] .select2-selection--single .select2-selection__clear {
+        float: left
+    }
+
+    .select2-container--classic[dir="rtl"] .select2-selection--single .select2-selection__arrow {
+        border: none;
+        border-right: 1px solid #aaa;
+        border-radius: 0;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+        left: 1px;
+        right: auto
+    }
+
+    .select2-container--classic.select2-container--open .select2-selection--single {
+        border: 1px solid #5897fb
+    }
+
+        .select2-container--classic.select2-container--open .select2-selection--single .select2-selection__arrow {
+            background: transparent;
+            border: none
+        }
+
+            .select2-container--classic.select2-container--open .select2-selection--single .select2-selection__arrow b {
+                border-color: transparent transparent #888 transparent;
+                border-width: 0 4px 5px 4px
+            }
+
+    .select2-container--classic.select2-container--open.select2-container--above .select2-selection--single {
+        border-top: none;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        background-image: -webkit-linear-gradient(top, #fff 0%, #eee 50%);
+        background-image: -o-linear-gradient(top, #fff 0%, #eee 50%);
+        background-image: linear-gradient(to bottom, #fff 0%, #eee 50%);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFFFF', endColorstr='#FFEEEEEE', GradientType=0)
+    }
+
+    .select2-container--classic.select2-container--open.select2-container--below .select2-selection--single {
+        border-bottom: none;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        background-image: -webkit-linear-gradient(top, #eee 50%, #fff 100%);
+        background-image: -o-linear-gradient(top, #eee 50%, #fff 100%);
+        background-image: linear-gradient(to bottom, #eee 50%, #fff 100%);
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFEEEEEE', endColorstr='#FFFFFFFF', GradientType=0)
+    }
+
+    .select2-container--classic .select2-selection--multiple {
+        background-color: white;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        cursor: text;
+        outline: 0
+    }
+
+        .select2-container--classic .select2-selection--multiple:focus {
+            border: 1px solid #5897fb
+        }
+
+        .select2-container--classic .select2-selection--multiple .select2-selection__rendered {
+            list-style: none;
+            margin: 0;
+            padding: 0 5px
+        }
+
+        .select2-container--classic .select2-selection--multiple .select2-selection__clear {
+            display: none
+        }
+
+        .select2-container--classic .select2-selection--multiple .select2-selection__choice {
+            background-color: #e4e4e4;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            cursor: default;
+            float: left;
+            margin-right: 5px;
+            margin-top: 5px;
+            padding: 0 5px
+        }
+
+        .select2-container--classic .select2-selection--multiple .select2-selection__choice__remove {
+            color: #888;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: bold;
+            margin-right: 2px
+        }
+
+            .select2-container--classic .select2-selection--multiple .select2-selection__choice__remove:hover {
+                color: #555
+            }
+
+    .select2-container--classic[dir="rtl"] .select2-selection--multiple .select2-selection__choice {
+        float: right;
+        margin-left: 5px;
+        margin-right: auto
+    }
+
+    .select2-container--classic[dir="rtl"] .select2-selection--multiple .select2-selection__choice__remove {
+        margin-left: 2px;
+        margin-right: auto
+    }
+
+    .select2-container--classic.select2-container--open .select2-selection--multiple {
+        border: 1px solid #5897fb
+    }
+
+    .select2-container--classic.select2-container--open.select2-container--above .select2-selection--multiple {
+        border-top: none;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0
+    }
+
+    .select2-container--classic.select2-container--open.select2-container--below .select2-selection--multiple {
+        border-bottom: none;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0
+    }
+
+    .select2-container--classic .select2-search--dropdown .select2-search__field {
+        border: 1px solid #aaa;
+        outline: 0
+    }
+
+    .select2-container--classic .select2-search--inline .select2-search__field {
+        outline: 0;
+        box-shadow: none
+    }
+
+    .select2-container--classic .select2-dropdown {
+        background-color: #fff;
+        border: 1px solid transparent
+    }
+
+    .select2-container--classic .select2-dropdown--above {
+        border-bottom: none
+    }
+
+    .select2-container--classic .select2-dropdown--below {
+        border-top: none
+    }
+
+    .select2-container--classic .select2-results > .select2-results__options {
+        max-height: 200px;
+        overflow-y: auto
+    }
+
+    .select2-container--classic .select2-results__option[role=group] {
+        padding: 0
+    }
+
+    .select2-container--classic .select2-results__option[aria-disabled=true] {
+        color: grey
+    }
+
+    .select2-container--classic .select2-results__option--highlighted[aria-selected] {
+        background-color: #3875d7;
+        color: #fff
+    }
+
+    .select2-container--classic .select2-results__group {
+        cursor: default;
+        display: block;
+        padding: 6px
+    }
+
+    .select2-container--classic.select2-container--open .select2-dropdown {
+        border-color: #5897fb
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .input-label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .section-title {
+        color: #ccc;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .w-1/5 {
+        width: 20%;
+    }
+
+    .Separator {
+        border-top: 1px solid #ccc;
+        margin: 20px 0;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .input-label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .section-title {
+        color: #ccc;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .w-1/5 {
+        width: 20%;
+    }
+
+    .Separator {
+        border-top: 1px solid #ccc;
+        margin: 20px 0;
+    }
+
+    .bg-darkslateblue {
+        background-color: darkslateblue;
+    }
+
+    .p-5 {
+        padding: 20px;
+    }
+
+    .text-gray-400 {
+        color: #ccc;
+    }
+
+    .input-group {
+        margin-bottom: 10px;
+    }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .input-group label {
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .input-label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold; /*yazıları kalınlaştır*/
+        color: white;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        opacity: 100%; /* Opaklık ekle */
+        vertical-align: text-top;
+        background: border-box;
+    }
+
+    .section-title {
+        color: #ccc;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .w-1/5 {
+        width: 20%;
+        padding: 0 10px; /* Adjust the padding as needed */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        gap: 20px; /* Kartlar arasındaki boşluk */
+    }
+
+    .Separator {
+        border-top: 1px solid #ccc;
+        margin: 20px 0;
+    }
+
+    /* Yeni stiller */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+    td {
+        background-color: #2C254A; /* Koyu arka plan rengi */
+        padding: 10px;
+        align-content: baseline;
+        flex: 1;
+    }
+
+    .divider {
+        width: 100%;
+        max-width: 1200px;
+        border-bottom: 2px solid #fff;
+        margin: 20px 0;
+    }
+
+    .alt-kart {
+        margin-top: 0px; /* İsteğe bağlı olarak ana kart ile alt kart arasında boşluk bırakmak için */
+        background-color: #f0f0f0;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        height: 700px;
+    }
+
+    .select2-selection__rendered {
+        color: white !important;
+    }
+</style>
+
+<link rel="~/stylesheet" href="~/vendor/select2/css/select2.min.css">
+<link href="~/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
+<link href="~/css/style.css" rel="stylesheet">
+<main>
+    <div class="row" style="margin-top:5px;">
+        <div class="col-lg-12">
+            <div class="card" style="background-color: #2C254A">
+                <div class="card-header" style="height: auto; background-color: #2C254A">
+                    <table class="w-full" style="align-content: baseline;">
+                        <tr>
+                            <td class="w-1/5" style="background-color: #2C254A">
+                                <label class="input-label">
+                                    Terminal Adı <div style="display:none" id="ID" class="">
+                                        @Html.TextBoxFor(m => m.Cihazlar.First().ID, new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(m => m.Cihazlar.First().ID, "", new { @class = "text-danger" })
+                                    </div>
+                                </label>
+                                <div  id="cihazAdi" class="">
+                                    @Html.TextBoxFor(m => m.Cihazlar.First().CihazAd, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Cihazlar.First().CihazAd, "", new { @class = "text-danger" })
+                                </div>
+                            </td>
+                            <td class="w-1/5" style="background-color: #2C254A">
+                                <label class="input-label">
+                                    İstasyon Kodu
+                                </label>
+                                <div id="cihazNo" class="">
+                                    @Html.TextBoxFor(m => m.CihazFromId.First().CihazNo, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.CihazFromId.First().CihazNo, "", new { @class = "text-danger" })
+                                </div>
+                            </td>
+                            <td class="w-1/5" style="background-color: #2C254A">
+                                <label class="input-label">
+                                    Cx
+                                </label>
+                                <div class="">
+                                    @Html.TextBoxFor(m => m.Cihazlar.First().KonumX, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Cihazlar.First().KonumX, "", new { @class = "text-danger" })
+                                </div>
+                            </td>
+                            <td class="w-1/5" style="background-color: #2C254A">
+                                <label class="input-label">
+                                    Cy
+                                </label>
+                                <div class="">
+                                    @Html.TextBoxFor(m => m.Cihazlar.First().KonumY, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Cihazlar.First().KonumY, "", new { @class = "text-danger" })
+                                </div>
+                            </td>
+                            <td class="w-1/5" style="background-color: #2C254A">
+                                <label class="input-label">
+                                    IMEI
+                                </label>
+                                <div  id="imeiNo" class="">
+                                    @Html.TextBoxFor(m => m.Cihazlar.First().ImeiNo, new { @class = "form-control" })
+                                    @Html.ValidationMessageFor(m => m.Cihazlar.First().ImeiNo, "", new { @class = "text-danger" })
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="card-body" style="background-color: #2C254A">
+                    @*<div class="form-validation">
+                    <form class="form-valide" action="#" method="post">*@
+                    <div class="row">
+                        <table class="w-full" style="align-content: baseline; background-color: #2C254A;">
+                            <tr>
+                                <td class="w-1/5" style="width:234px !important;">
+                                    <div class="alt-kart" style="margin-top:0px !important; background-color: #393360;">
+                                        <p class="text-gray-400" style="font-weight: bold;">Alarm Limit Tanımlamaları</p>
+                                        <div class="row">
+                                            <div class="col" style="align-content: baseline;">
+                                                <label class="input-label" for="limit1">Limit 1 (cm)</label>
+                                                <div id="limit1" class="">
+                                                    @Html.TextBoxFor(m => m.CihazFromId.First().Alarm1, new { @class = "form-control" })
+                                                    @Html.ValidationMessageFor(m => m.CihazFromId.First().Alarm1, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <label class="input-label" for="Foto-Sn">Foto - Sn</label>
+                                                <div id="Foto-Sn1" class="">
+                                                    @Html.TextBoxFor(m => m.CihazFromId.First().ResimIntA1, new { @class = "form-control" })
+                                                    @Html.ValidationMessageFor(m => m.CihazFromId.First().ResimIntA1, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <label class="input-label" for="limit1">Limit 2 (cm)</label>
+                                                <div id="limit2" class="">
+                                                    @Html.TextBoxFor(m => m.CihazFromId.First().Alarm2, new { @class = "form-control" })
+                                                    @Html.ValidationMessageFor(m => m.CihazFromId.First().Alarm2, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <label class="input-label" for="Foto-Sn">Foto - Sn</label>
+                                                <div id="Foto-Sn2" class="">
+                                                    @Html.TextBoxFor(m => m.CihazFromId.First().ResimIntA2, new { @class = "form-control" })
+                                                    @Html.ValidationMessageFor(m => m.CihazFromId.First().ResimIntA2, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col">
+                                                <label class="input-label" for="limit1">Limit 3 (cm)</label>
+                                                <div id="limit3" class="">
+                                                    @Html.TextBoxFor(m => m.CihazFromId.First().Alarm3, new { @class = "form-control" })
+                                                    @Html.ValidationMessageFor(m => m.CihazFromId.First().Alarm3, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                            <div class="col">
+                                                <label class="input-label" for="Foto-Sn">Foto - Sn</label>
+                                                <div id="Foto-Sn3" class="">
+                                                    @Html.TextBoxFor(m => m.CihazFromId.First().ResimIntA3, new { @class = "form-control" })
+                                                    @Html.ValidationMessageFor(m => m.CihazFromId.First().ResimIntA3, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <label class="input-label" for="aku-voltaj">Aku Voltaj Kritik Seviye V</label>
+                                        <div id="aku-voltaj" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().Aku, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().Aku, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="haberlesme-period">Haberleşme Period</label>
+                                        <div id="haberlesme-period" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().VeriInt, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().VeriInt, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="foto-gonderme-period">Foto Gönderme Period</label>
+                                        <div id="foto-gonderme-period" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().ResimInt, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().ResimInt, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+
+                                </td>
+                                <td class="w-1/5" style="width:234px !important;">
+                                    <div class="alt-kart" style="margin-top: -120px !important; background-color: #393360;">
+                                        <p class="text-gray-400" style="font-weight: bold;">Alarm Limit Tanımlamaları</p>
+                                        <label class="input-label" for="il">İl </label>
+                                        <select id="citySelect" class="default-placeholder js-city-select select2-hidden-accessible" data-select2-id="52" tabindex="-1" aria-hidden="true" style="color: #cbb7b7;">
+                                            <option style="color:white;" value="@Model.Cihazlar.First().IlAd">@Model.Cihazlar.First().IlAd</option>
+                                        </select>
+                                        <label class="input-label" for="ilce">İlçe </label>
+                                        <select id="districtSelect" class="default-placeholder js-district-select select2-hidden-accessible" data-select2-id="58" tabindex="-1" aria-hidden="true">
+                                            <option value="@Model.Cihazlar.First().Ilce">@Model.Cihazlar.First().Ilce</option>
+                                        </select>
+                                        <label class="input-label" for="kamera-tipi">Kamera Tipi </label>
+                                        <div class="input-group">
+                                            <Input class="form-control input-field" label="Kamera Tipi" id="kamera-tipi" />
+                                        </div>
+                                        <label for="markaSelect" class="input-label">Üretici Firma</label>
+                                        <select id="markaSelect" class="form-control">
+                                            <option value="">Select a Marka</option>
+                                            @foreach (var marka in Model.Markalar)
+                                            {
+                                                <option value="@marka">@marka</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </td>
+                                <td class="w-1/5" style="width:234px !important;">
+                                    <div class="alt-kart" style="margin-top: -75px !important; background-color: #393360">
+                                        <p class="text-gray-400" style="font-weight: bold;">Sarı Alarm</p>
+                                        <label class="input-label" for="telefon1">Telefon 1</label>
+                                        <div id="a1Tel1" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().A1Tel1, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().A1Tel1, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="telefon2">Telefon 2</label>
+                                        <div id="a1Tel2" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().A1Tel2, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().A1Tel2, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="telefon3">Telefon 3</label>
+                                        <div id="a1Tel3" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().A1Tel3, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().A1Tel3, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="telefon4">Telefon 4</label>
+                                        <div id="a1Tel4" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().A1Tel4, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().A1Tel4, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="telefon5">Telefon 5</label>
+                                        <div id="a1Tel5" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().A1Tel5, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().A1Tel5, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="w-1/5" style="width:234px !important;">
+                                    <div class="alt-kart" style="margin-top: -75px !important; background-color: #393360">
+                                        <p class="text-gray-400" style="font-weight: bold;">Kırmızı Alarm</p>
+                                        <label class="input-label" for="telefon1">Telefon 1</label>
+                                        <div id="a2Tel1" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().A2Tel1, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().A2Tel1, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="telefon2">Telefon 2</label>
+                                        <div id="a2Tel2" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().A2Tel2, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().A2Tel2, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="telefon3">Telefon 3</label>
+                                        <div id="a2Tel3" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().A2Tel3, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().A2Tel3, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="telefon4">Telefon 4</label>
+                                        <div id="a2Tel4" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().A2Tel4, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().A2Tel4, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="telefon5">Telefon 5</label>
+                                        <div id="a2Tel5" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().A2Tel5, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().A2Tel5, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="w-1/5" style="width:234px !important;">
+                                    <div class="alt-kart" style="margin-top: 0px !important; background-color: #393360">
+                                        <p class="text-gray-400" style="font-weight: bold;">Kalibrasyon Değerleri</p>
+                                        <label class="input-label" for="Offset (mm)">Offset (mm)</label>
+                                        <div id="SensorOffset" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().SensorOffset, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().SensorOffset, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="Offset Adc">Offset Adc</label>
+                                        <div id="AdcOffset" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().AdcOffset, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().AdcOffset, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="L420 (Sensor min değeri)">L420 (Sensor min değeri)</label>
+                                        <div  id="MinDeger" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().MinDeger, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().MinDeger, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="H420 (Sensör max değeri)">H420 (Sensör max değeri)</label>
+                                        <div id="MaxDeger" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().MaxDeger, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().MaxDeger, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="RADAR SURE">RADAR SURE</label>
+                                        <div id="RadarSure" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().RadarSure, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().RadarSure, "", new { @class = "text-danger" })
+                                        </div>
+                                        <label class="input-label" for="VEGA SENSOR TIP">VEGA SENSOR TIP</label>
+                                        <div id="SensorTip" class="">
+                                            @Html.TextBoxFor(m => m.CihazFromId.First().SensorTip, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(m => m.CihazFromId.First().SensorTip, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        <div class="form-group row" style="margin-left:1200px; margin-top:5px;">
+                            <div class="col-lg-8 ml-auto">
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-primary mb-2" data-toggle="modal" data-target="#exampleModalCenter">Gönder</button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="exampleModalCenter">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Uyarı</h5>
+                                                <button type="button" class="close" data-dismiss="modal">
+                                                    <span>&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Yapılan değişiklikleri kaydetmek istiyor musunuz?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger light" data-dismiss="modal">Kapat</button>
+                                                <button id="modalSubmit" type="button" class="btn btn-primary">Gönder</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @*</form>*@
+                    @*</div>*@
+                </div>
+            </div>
+        </div>
+        </div>
+
+        @section scripts{
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+            <script>
+
+
+                $('#modalSubmit').on('click', function () {
+                   
+                    var cihaz = {
+                        ID: $('#ID input').val(),
+                        CihazNo: $('#cihazNo input').val(),
+                        CihazId: null,
+                        CihazAd: $('#cihazAdi input').val(),
+                        fkMarka: $('#markaSelect option:selected').text(),
+                        fkTip: $('#tip input').val(),
+                        IpNo: $('#ipNo input').val(),
+                        SimCardNo: $('#simCardNo input').val(),
+                        ImeiNo: $('#imeiNo input').val(),
+                        fkKonum: null,
+                        Durum: $('#durum input').val(),
+                        SonData: $('#sonData input').val(),
+                        SuSeviye: parseFloat($('#suSeviye input').val()) || 0,
+                        Aku: parseFloat($('#aku-voltaj input').val()) || 0,
+                        VeriInt: parseInt($('#haberlesme-period input').val(), 10) || 0,
+                        ResimInt: parseInt($('#foto-gonderme-period input').val(), 10) || 0,
+                        ResimKalite: null,
+                        ResimW: null,
+                        ResimH: null,
+                        Alarm1: $('#limit1 input').val(),
+                        Alarm2: $('#limit2 input').val(),
+                        Alarm3: $('#limit3 input').val(),
+                        ResimIntA1: $('#Foto-Sn1 input').val(),
+                        ResimIntA2: $('#Foto-Sn2 input').val(),
+                        ResimIntA3: $('#Foto-Sn3 input').val(),
+                        A1Tel1: $('#a1Tel1 input').val(),
+                        A1Tel2: $('#a1Tel2 input').val(),
+                        A1Tel3: $('#a1Tel3 input').val(),
+                        A1Tel4: $('#a1Tel4 input').val(),
+                        A1Tel5: $('#a1Tel5 input').val(),
+                        A2Tel1: $('#a2Tel1 input').val(),
+                        A2Tel2: $('#a2Tel2 input').val(),
+                        A2Tel3: $('#a2Tel3 input').val(),
+                        A2Tel4: $('#a2Tel4 input').val(),
+                        A2Tel5: $('#a2Tel5 input').val(),
+                        A3Tel1: $('#a3Tel1 input').val(),
+                        A3Tel2: $('#a3Tel2 input').val(),
+                        A3Tel3: $('#a3Tel3 input').val(),
+                        A3Tel4: $('#a3Tel4 input').val(),
+                        A3Tel5: $('#a3Tel5 input').val(),
+                        SensorOffset: $('#SensorOffset input').val(),
+                        AdcOffset: $('#AdcOffset input').val(),
+                        MinDeger: $('#MinDeger input').val(),
+                        MaxDeger: $('#MaxDeger input').val(),
+                        RadarSure: $('#RadarSure input').val(),
+                        SensorTip: $('#SensorTip input').val(),
+                        Bolge: $('#bolge input').val(),
+                        Derinlik: parseFloat($('#derinlik input').val()) || 0,
+                        CihazMontaj: parseFloat($('#cihazMontaj input').val()) || 0,
+                        Kot: parseFloat($('#kot input').val()) || 0,
+                        StatikSeviye: parseFloat($('#statikSeviye input').val()) || 0,
+                        DinamikSeviye: parseFloat($('#dinamikSeviye input').val()) || 0,
+                        fkHavza: null
+                    };
+
+                    $.ajax({
+
+                        type: 'POST',
+                        url: '/Home/CihazAddKayit', // Doğru URL'yi kontrol edin
+                        contentType: 'application/json', // JSON formatında veri göndereceğimizi belirt
+                        data: JSON.stringify(cihaz), // Cihaz nesnesini JSON formatında gönderiyoruz
+                        success: function (response) {
+                            // API'den başarılı yanıt alındığında
+                            alert(response.message);
+
+                            // Modalı kapatma
+                            $('#exampleModalCenter').modal('hide');
+
+                        },
+                        error: function () {
+                            // Hata durumunda bildirim
+                            alert('Bir hata oluştu.');
+                        }
+                    });
+                });
+            </script>
+            <script>
+                $(document).ready(function () {
+    console.log('Document ready.');
+
+
+    $.ajax({
+        url: '/Home/GetDistinctMarka',
+        type: 'GET',
+        success: function (data) {
+            console.log('AJAX request for Marka successful.');
+          /*  console.log('Received Marka data:', data); */
+
+            var markaDropdown = $('#markaSelect');
+            markaDropdown.empty();
+            markaDropdown.append('<option value="">Select a Marka</option>');
+
+            // Seçili markayı modelden al
+            var selectedMarka = '@Model.Cihazlar.First().fkMarka';
+
+            // API'den gelen verilerle dropdown
+            $.each(data, function (index, item) {
+
+                var normalizedSelectedMarka = selectedMarka.toLowerCase();
+                var normalizedItem = item.toLowerCase();
+
+                // Karşılaştırmayı iki şekilde yap
+                var isSelected = normalizedItem === normalizedSelectedMarka ||
+                    item.toUpperCase() === selectedMarka.toUpperCase();
+
+                markaDropdown.append($('<option>', {
+                    value: item,
+                    text: item,
+                    selected: isSelected // Seçili markayı işaretle
+                }));
+            });
+
+            // Select2'yi yeniden başlat
+            initializeSelect2(markaDropdown, "Select a Marka");
+        },
+        error: function (error) {
+            console.error('AJAX request for Marka failed:', error);
+        }
+    });
+
+
+    const citiesApiUrl = '/Home/GetCityList';
+    const dynamicDistrictsApiUrl = (ilKod) => `/Home/GetDistrictList?ilKod=${ilKod}`;
+
+    const citySelect = $('#citySelect');
+    const districtSelect = $('#districtSelect');
+
+    if (!citySelect.length || !districtSelect.length) {
+        console.error('Select elements not found in the DOM.');
+        return;
+    }
+
+    // Şehir seçim kutusunu başlat
+    initializeSelect2(citySelect, "Select a city");
+
+    // İlçe seçim kutusunu başlat
+    initializeSelect2(districtSelect, "Select a district");
+
+    // Şehirleri al ve doldur
+    $.getJSON(citiesApiUrl)
+        .done(function (citiesData) {
+            console.log('Cities data received:', citiesData); // Şehir verilerini kontrol edin
+
+            citiesData.sort((a, b) => a.IlAd.localeCompare(b.IlAd));
+            citiesData.forEach(city => {
+                const option = new Option(city.IlAd, city.IlKod, false, false);
+                citySelect.append(option);
+            });
+
+            // Şehir seçiminde değişiklik olduğunda ilçeleri güncelle
+            citySelect.on('change', function () {
+                const ilKod = $(this).val();
+                console.log('Selected city code:', ilKod); // Seçilen il kodunu kontrol et
+
+                districtSelect.empty().append(new Option("Select a district", ""));
+                districtSelect.data('select2-initialized', false); // İlçe seçim kutusu başlatılmasını sıfırla
+
+                if (ilKod) {
+                    $.getJSON(dynamicDistrictsApiUrl(ilKod))
+                        .done(function (districtsData) {
+                          /*  console.log('Districts data received:', districtsData); */
+
+                            districtsData.sort((a, b) => a.Ilce.localeCompare(b.Ilce));
+                            districtsData.forEach(district => {
+                                const option = new Option(district.Ilce.trim(), district.IlceKod, false, false);
+                                districtSelect.append(option);
+                            });
+
+                            // İlçe seçim kutusunu yeniden başlat
+                            initializeSelect2(districtSelect, "Select a district");
+                        })
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                          /*  console.error('İlçe verisi alınırken hata oluştu:', textStatus, errorThrown); */
+                        });
+                }
+            });
+        })
+        .fail(function () {
+            console.error('Şehir verisi alınırken hata oluştu.');
+        });
+
+    // Marka seçimi değiştiğinde çalışacak kısım
+    $('#markaSelect').on('change', function () {
+        var selectedMarka = $(this).val();
+       /* console.log('Selected Marka:', selectedMarka); */
+
+
+    });
+
+
+});
+
+// Select2'yi başlatma fonksiyonu
+function initializeSelect2(element, placeholder) {
+    element.select2({
+        placeholder: placeholder
+    });
+}
+            </script>
+
+            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+            <script src="~/vendor/global/global.min.js"></script>
+            <script src="~/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+            <script src="~/vendor/chart.js/Chart.bundle.min.js"></script>
+            <script src="~/vendor/owl-carousel/owl.carousel.js"></script>
+            <script src="~/js/custom.min.js"></script>
+            <script src="~/js/plugins-init/select2-init.js"></script>
+            <script data-cfasync="false" src="../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+            <script src="~/vendor/global/global.min.js"></script>
+            <script src="~/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+            <script src="~/vendor/select2/js/select2.full.min.js"></script>
+        }
+
+</main>
+
+
+
+
+
+---------------------------------
+
+
+
+
+
+ 
