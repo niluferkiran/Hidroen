@@ -1,0 +1,193 @@
+﻿@{
+    ViewBag.Title = "İlçe Tanımı";
+    string apiKey = ViewBag.ApiKey;
+}
+
+
+<main aria-labelledby="title">
+
+    <div class="card" style="margin-top:5px !important;">
+        <div class="card-header d-sm-flex d-block" style="max-height:100px !important;">
+
+            <div class="mr-auto mb-sm-0 mb-3">
+                <h4 class="card-title mb-2">İlçe Tanımı</h4>
+                <div class="input-group right search-area d-lg-inline-flex d-none" style="margin-top:2px;">
+
+                    <input style="border: none; background-color: #2C254A; color:white;" class="flex h-9 w-full rounded-md px-3 py-1 text-xs shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50" placeholder="Ara" name="name" id="searchInput"><div class="input-group-append">
+                        <span class="input-group-text">
+                            <a href="javascript:void(0)">
+                                <i class="flaticon-381-search-2"></i>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table style-1" id="ListDatatableView">
+                    <thead>
+                        <tr>
+                            <th>İl Kod</th>
+                            <th>İl Ad</th>
+                            <th>İlçe Ad</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    @section Scripts {
+        <script>
+            $(document).ready(function () {
+                const citiesApiUrl = '/Home/GetCityList'; // Controller'daki GetCityList metoduna istek
+                const districtsApiUrl = (ilKod) => `/Home/GetDistrictList?ilKod=${ilKod}`; // Dinamik olarak ilKod'a göre ikinci isteği oluştur
+
+                // Şehirleri al
+                $.ajax({
+                    url: citiesApiUrl,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (citiesData) {
+                        // İlleri alfabetik olarak sırala
+                        citiesData.sort((a, b) => a.IlAd.localeCompare(b.IlAd));
+
+                        const tbody = $('#ListDatatableView tbody');
+
+                        // Her şehir için ilçeleri çek ve tabloya ekle
+                        citiesData.forEach(city => {
+                            const ilKod = city.IlKod;
+                            const ilAd = city.IlAd;
+
+                            // Dinamik olarak ilKod'a göre ilçeleri al
+                            $.ajax({
+                                url: districtsApiUrl(ilKod),
+                                type: 'GET',
+                                dataType: 'json',
+                                success: function (districtsData) {
+                                    // İlçeleri alfabetik sıraya göre ekle
+                                    districtsData.sort((a, b) => a.Ilce.localeCompare(b.Ilce));
+
+                                    districtsData.forEach(district => {
+                                        const row = `
+                                            <tr>
+                                                <td>${ilKod}</td>
+                                                <td>${ilAd}</td>
+                                                <td>${district.Ilce}</td>
+                                            </tr>
+                                        `;
+                                        tbody.append(row);
+                                    });
+                                },
+                                error: function () {
+                                    console.error('İlçe verisi alınırken hata oluştu.');
+                                }
+                            });
+                        });
+                    },
+                    error: function () {
+                        console.error('Şehir verisi alınırken hata oluştu.');
+                    }
+                });
+                $('#searchInput').on('keyup', function () {
+                    const value = $(this).val().toLowerCase().trim();
+                    $('#ListDatatableView tbody tr').filter(function () {
+                        // Sadece ilçe sütununda (örneğin 2. sütun) arama yap
+                        $(this).toggle($(this).find('td:nth-child(3)').text().toLowerCase().indexOf(value) > -1);
+                    });
+                });
+
+                //// Arama kutucuğu ile filtreleme
+                //$('#searchInput').on('keyup', function () {
+                //    const value = $(this).val().toLowerCase().trim();
+                //    $('#ListDatatableView tbody tr').filter(function () {
+                //        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                //    });
+                //});
+            });
+        </script>
+
+
+        @*<script>
+                $(document).ready(function () {
+                    // İlk API URL'si
+                    const citiesApiUrl = 'http://212.64.204.142:21147/api/Susis/GetCityList';
+
+                    // Dinamik olarak ikinci API URL'sini oluştur
+                    const dynamicDistrictsApiUrl = (ilKod) => `http://localhost:53055/api/Susis/GetProvience/${ilKod}`;
+
+                    // İlk olarak şehirleri al
+                    $.getJSON(citiesApiUrl)
+                        .done(function (citiesData) {
+                            // İlleri alfabetik olarak sırala
+                            citiesData.sort((a, b) => a.IlAd.localeCompare(b.IlAd));
+
+                            // Tabloya verileri ekle
+                            const tbody = $('#ListDatatableView tbody');
+                            citiesData.forEach(city => {
+                                const ilKod = city.IlKod;
+                                const ilAd = city.IlAd;
+
+                                // İkinci API URL'sini dinamik olarak oluştur
+                                const dynamicUrl = dynamicDistrictsApiUrl(ilKod);
+
+                                // İkinci API'yi çağır ve ilçeleri al
+                                $.getJSON(dynamicUrl)
+                                    .done(function (districtsData) {
+                                        // İlçeleri alfabetik olarak sırala
+                                        districtsData.sort((a, b) => a.Ilce.localeCompare(b.Ilce));
+
+                                        // İlçeleri tabloya ekle
+                                        districtsData.forEach(district => {
+                                            const row = `
+                                            <tr>
+                                                <td>${ilKod}</td>
+                                                <td>${ilAd}</td>
+                                                <td>${district.Ilce}</td>
+                                            </tr>
+                                        `;
+                                            tbody.append(row);
+                                        });
+                                    })
+                                    .fail(function () {
+                                        console.error('İlçe verisi alınırken hata oluştu.');
+                                    });
+                            });
+                        })
+                        .fail(function () {
+                            console.error('Şehir verisi alınırken hata oluştu.');
+                        });
+
+                    // Arama kutucuğuna olay dinleyicisi ekle
+                    $('#searchInput').on('keyup', function () {
+                        const value = $(this).val().toLowerCase();
+                        $('#ListDatatableView tbody tr').filter(function () {
+                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                        });
+                    });
+                });
+            </script>*@
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+        <script src="~/vendor/global/global.min.js"></script>
+        <script src="~/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+        <script src="~/vendor/chart.js/Chart.bundle.min.js"></script>
+        <script src="~/vendor/owl-carousel/owl.carousel.js"></script>
+        <script src="~/js/custom.min.js"></script>
+    }
+</main>
+
+
+
+
+
+
+

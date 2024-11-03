@@ -1,0 +1,320 @@
+﻿@{
+    ViewBag.Title = "HavzaBazinda";
+    string apiKey = ViewBag.ApiKey;
+}
+
+@model List<SusisProject_V6.Controllers.HomeController.HavzaModel>
+
+
+<main aria-labelledby="title">
+
+    <style>
+        .container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        .left-column {
+            width: 1700px;
+            background-color: darkslateblue;
+            padding: 0px;
+        }
+
+        .right-column {
+            width: 300px; /*300px*/
+            background-color: #3B3363;
+            padding: 20px;
+            padding-left: 1px;
+            padding-right: 12px;
+        }
+
+        .active-il {
+            background-color: navy;
+            color: white;
+        }
+
+        .mt-2 {
+            background-color: #393360;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .il-item {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+            .il-item:hover {
+                background-color: #332c52;
+                color: #eb8153;
+            }
+
+            .il-item p {
+                margin: 0;
+                font-size: 14px;
+                color: #fff;
+            }
+
+        .scrollable {
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .selected {
+            background-color: #eb8153;
+            color: #fff;
+        }
+
+        .selected-options {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .selected-option {
+            display: inline-block;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #332c52;
+            color: #fff;
+        }
+
+            .selected-option span {
+                margin-left: 5px;
+                cursor: pointer;
+                color: #eb8153;
+            }
+
+        .checkbox {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin-right: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            background-color: #fff;
+        }
+
+            .checkbox:checked {
+                background-color: #eb8153;
+            }
+
+                .checkbox:checked::before {
+                    content: '✔';
+                    color: #fff;
+                    font-size: 12px;
+                }
+
+        .sticky {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .custom-col-9 {
+            flex: 0 0 80%; /* 80% genişlik */
+            max-width: 78%;
+            padding-right: 0px;
+        }
+
+        .custom-col-3 {
+            flex: 0 0 20%; /* 20% genişlik */
+            max-width: 22%;
+            margin-left: 5px;
+        }
+        /* Sağ üstte sabit duracak bilgi paneli */
+        #info-panel {
+            position: absolute;
+            top: 60px;
+            left: 30px;
+            background-color: white;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 10; /* Haritanın üstünde durması için z-index veriyoruz */
+        }
+
+        /* Bilgi panelindeki semboller ve metinler */
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .info-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 5px;
+        }
+    </style>
+
+    <div class="row" style="margin-top:10px !important; flex-wrap: nowrap !important; height: 100vh;">
+
+        <div class="col-xl-9 col-lg-8 col-md-7 custom-col-9">
+            <div id="info-panel">
+                @*<h4>Veri Sembolleri</h4>*@
+                <div id="panel-content">
+                    <!-- Bu alan sabit sembol ve isimlerle doldurulacak -->
+                    <div class="info-item">
+                        <img src="https://maps.google.com/mapfiles/ms/icons/green-dot.png" class="info-icon" />
+                        <span>GÖL GÖZLEM</span>
+                    </div>
+                    <div class="info-item">
+                        <img src="https://maps.gstatic.com/mapfiles/ms2/micons/grn-pushpin.png" class="info-icon" />
+                        <span>TEUS</span>
+                    </div>
+                    <div class="info-item">
+                        <img src="~/images/icons8-circle-24.png" class="info-icon" />
+                        <span>KUYU KALİTE GÖZLEM</span>
+                    </div>
+                    <div class="info-item">
+                        <img src="~/images/icons8-triangle-24.png" class="info-icon" />
+                        <span>AGI</span>
+                    </div>
+                    <div class="info-item">
+                        <img src="~/images/symbol_fore_close.png" class="info-icon" />
+                        <span>Debimetre</span>
+                    </div>
+                </div>
+            </div>
+            <div id="map" class="card" style="height:800px;" @*style="height: 700px; width:900px"*@></div>
+        </div>
+
+        <div class="col-xl-3 col-lg-4 col-md-5 custom-col-3" style="max-width:fit-content;">
+            <div class="row">
+                <div class="col-xl-12 col-lg-6 col-sm-6">
+
+                    <div class="right-column" style="height: 800px !important; width: 287px; margin-left: -10px;">
+                        <div class="scrollable">
+                            <div class="sticky top-0 bg-[#393360] p-4">
+                                <div class="flex flex-col">
+
+                                    <input style="color:white; width:240px;" class="flex h-9 w-full rounded-md border border-gray-600 bg-transparent px-3 py-1 text-xs shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50" placeholder="Ara" name="name" id="searchInput">
+                                    <div id="selected-options-list" class="selected-options"></div>
+                                </div>
+                            </div>
+                            <div class="mt-2" id="cardList">
+                                @foreach (var havza in Model)
+                                {
+                                    <div class="il-item">
+                                        <p>@havza.HavzaAdi</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @section Scripts {
+        <script>
+            function initMap() {
+                var mapOptions = {
+                    center: { lat: 38.50848, lng: 29.69016 }, //uşak,sivaslı
+                    zoom: 8
+                };
+                var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+
+                fetch('http://erp.artyazilim.net/api/Susis/GetHavza')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(coordinates => {
+                        /*   console.log('Data received:', coordinates); */
+
+                        coordinates.forEach(function (coordinate) {
+                            if (coordinate.KonumX != null && coordinate.KonumY != null) {
+                                var markerColor;
+                                switch (coordinate.Durum) {
+                                    case "0":
+                                        markerColor = 'yellow';
+                                        break;
+                                    case "1":
+                                        markerColor = 'green';
+                                        break;
+                                    default:
+                                        marker.setVisible(false);
+                                        markerColor = 'black';
+                                        break;
+                                }
+
+                                var marker = new google.maps.Marker({
+                                    position: { lat: parseFloat(coordinate.KonumX), lng: parseFloat(coordinate.KonumY) },
+                                    map: map,
+                                    icon: {
+                                        path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+                                        fillColor: markerColor,
+                                        fillOpacity: 1,
+                                        strokeColor: 'black',
+                                        strokeWeight: 1,
+                                        scale: 7
+                                    }
+                                });
+
+                                var contentString = '<div><strong></strong>' + (coordinate.CihazAd || '') + '</div>' +
+                                    '<div><strong>ImeiNo:</strong> ' + (coordinate.ImeiNo || '') + '</div>' +
+                                    '<div><strong>Ölçüm Yeri:</strong> ' + (coordinate.OlcumYeri || '') + '</div>' +
+                                    '<div><strong>Su Seviye:</strong> ' + (coordinate.SuSeviye || '') + '</div>' +
+                                    '<div><strong>Akü:</strong> ' + (coordinate.Aku || '') + '</div>' +
+                                    '<div><strong>Son Data:</strong> ' + (coordinate.SonData || '') + '</div>' +
+                                    '<div><strong>Cihaz Adı:</strong> ' + (coordinate.CihazAd || '') + '</div>' +
+                                    '<div><strong>İl:</strong> ' + (coordinate.IlAd || '') + '</div>' +
+                                    '<div><strong>İlçe :</strong> ' + (coordinate.Ilce || '') + '</div>' +
+                                    '<div><strong>IP No:</strong> ' + (coordinate.IpNo || '') + '</div>' +
+                                    '<div><strong>SIM Kart No:</strong> ' + (coordinate.SimCardNo || '') + '</div>' +
+                                    '<div><strong>Marka :</strong> ' + (coordinate.fkMarka || '') + '</div>' +
+                                    '<div><strong>Tip :</strong> ' + (coordinate.fkTip || '') + '</div>';
+
+                                var infowindow = new google.maps.InfoWindow({
+                                    content: contentString
+                                });
+
+                                marker.addListener('click', function () {
+                                    infowindow.open(map, marker);
+                                });
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                    });
+            }
+
+
+            window.onload = initMap;
+        </script>
+
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZ-ARlakPGzJRf-Cj2_F8ZI46nwkl9CtU&callback=initMap" async defer></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="~/vendor/global/global.min.js"></script>
+        <script src="~/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+        <script src="~/vendor/chart.js/Chart.bundle.min.js"></script>
+        <script src="~/vendor/owl-carousel/owl.carousel.js"></script>
+        <script src="~/js/custom.min.js"></script>
+    }
+</main>
+
+
+
+
+
+
+

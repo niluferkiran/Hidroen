@@ -1,0 +1,249 @@
+﻿@{
+    ViewBag.Title = "İl Tanımı";
+    string apiKey = ViewBag.ApiKey;
+}
+
+<main aria-labelledby="title">
+
+
+    <div class="card" style="margin-top:5px !important;">
+        <div class="card-header d-sm-flex d-block" style="max-height:100px !important;">
+
+            <div class="mr-auto mb-sm-0 mb-3">
+                <h4 class="card-title mb-2">İl Tanımı</h4>
+                <div class="input-group right search-area d-lg-inline-flex d-none" style="margin-top:2px;">
+
+                    <input style="border: none; background-color: #2C254A; color:white;" class="flex h-9 w-full rounded-md px-3 py-1 text-xs shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50" placeholder="Ara" name="name" id="searchInput"><div class="input-group-append">
+                        <span class="input-group-text">
+                            <a href="javascript:void(0)">
+                                <i class="flaticon-381-search-2"></i>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table style-1" id="ListDatatableView">
+                    <thead>
+                        <tr>
+                            <th>İl Kod</th>
+                            <th>İl Ad</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            $(document).ready(function () {
+                const apiUrl = '/Home/GetCityList'; // Controller'daki methoda istek atıyoruz
+
+                let cityData = [];
+
+                $.ajax({
+                    url: apiUrl,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                       /* console.log(data); // Gelen veriyi kontrol et*/
+
+                        // Eğer success kontrolü gerekiyorsa (API yanıtında success varsa)
+                        if (data.success === false) {
+                            console.error(data.message); // Hata mesajını göster
+                            return;
+                        }
+
+                        // Verileri cityData'ya aktar ve sıralama işlemi yap
+                        cityData = data.sort((a, b) => a.IlAd.localeCompare(b.IlAd));
+
+                        const tbody = $('#ListDatatableView tbody');
+                        tbody.empty(); // Önce tabloyu boşalt
+
+                        // Tablonun satırlarını oluştur
+                        cityData.forEach(item => {
+                            const row = `
+                                <tr>
+                                    <td>${item.IlKod}</td>
+                                    <td>${item.IlAd}</td>
+                                </tr>
+                            `;
+                            tbody.append(row);
+                        });
+
+                        // Arama filtresi
+                        $('#searchInput').on('keyup', function () {
+                            const value = $(this).val().toLowerCase().trim();
+
+                            const filteredData = cityData.filter(item => {
+                                return item.IlAd.toLowerCase().includes(value);
+                            });
+
+                            tbody.empty(); // Önce tabloyu boşalt
+
+                            // Filtrelenmiş verileri tabloya ekle
+                            filteredData.forEach(item => {
+                                const row = `
+                                    <tr>
+                                        <td>${item.IlKod}</td>
+                                        <td>${item.IlAd}</td>
+                                    </tr>
+                                `;
+                                tbody.append(row);
+                            });
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Veri çekerken hata oluştu:', error); // Hata mesajını göster
+                        console.log('Durum:', status); // Durumu kontrol et
+                        console.log('Yanıt:', xhr.responseText); // API'den gelen cevabı göster
+                    }
+                });
+            });
+        </script>
+
+        @*<script>
+                $(document).ready(function () {
+                    const apiUrl = '/City/GetCityList'; // Controller'daki methoda istek atıyoruz
+
+                    let cityData = [];
+
+                    $.ajax({
+                        url: apiUrl,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            console.log(data);
+
+                            // Eğer hata varsa, data.success kontrolü ekleyebilirsin.
+                            if (!data.success) {
+                                console.error(data.message);
+                                return;
+                            }
+
+                            cityData = data.sort((a, b) => a.IlAd.localeCompare(b.IlAd));
+
+                            const tbody = $('#ListDatatableView tbody');
+                            cityData.forEach(item => {
+                                const row = `
+                                    <tr>
+                                        <td>${item.IlKod}</td>
+                                        <td>${item.IlAd}</td>
+                                    </tr>
+                                `;
+                                tbody.append(row);
+                            });
+
+                            $('#searchInput').on('keyup', function () {
+                                const value = $(this).val().toLowerCase().trim();
+
+                                console.log('Arama Girdisi:', value);
+
+                                const filteredData = cityData.filter(item => {
+                                    const ilAd = item.IlAd.toLowerCase().trim();
+                                    console.log('Kontrol Edilen:', ilAd);
+                                    return ilAd.includes(value);
+                                });
+
+                                tbody.empty();
+
+                                filteredData.forEach(item => {
+                                    const row = `
+                                        <tr>
+                                            <td>${item.IlKod}</td>
+                                            <td>${item.IlAd}</td>
+                                        </tr>
+                                    `;
+                                    tbody.append(row);
+                                });
+                            });
+                        },
+                        error: function () {
+                            console.error('Veri çekerken hata oluştu.');
+                        }
+                    });
+                });
+            </script>*@
+
+        @*<script>
+                $(document).ready(function () {
+                    const apiUrl = 'http://212.64.204.142:21147/api/Susis/GetCityList';
+
+                    let cityData = [];
+
+                    $.ajax({
+                        url: apiUrl,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            console.log(data);
+
+                            cityData = data.sort((a, b) => a.IlAd.localeCompare(b.IlAd));
+
+                            const tbody = $('#ListDatatableView tbody');
+                            cityData.forEach(item => {
+                                const row = `
+                                                                                        <tr>
+                                                                                            <td>${item.IlKod}</td>
+                                                                                            <td>${item.IlAd}</td>
+                                                                                        </tr>
+                                                                                    `;
+                                tbody.append(row);
+                            });
+
+                            $('#searchInput').on('keyup', function () {
+                                const value = $(this).val().toLowerCase().trim();
+
+                                console.log('Arama Girdisi:', value);
+
+                                const filteredData = cityData.filter(item => {
+                                    const ilAd = item.IlAd.toLowerCase().trim();
+                                    console.log('Kontrol Edilen:', ilAd);
+                                    return ilAd.includes(value);
+                                });
+
+                                tbody.empty();
+
+                                filteredData.forEach(item => {
+                                    const row = `
+                                                                                            <tr>
+                                                                                                <td>${item.IlKod}</td>
+                                                                                                <td>${item.IlAd}</td>
+                                                                                            </tr>
+                                                                                        `;
+                                    tbody.append(row);
+                                });
+                            });
+                        },
+                        error: function () {
+                            console.error('Veri çekerken hata oluştu.');
+                        }
+                    });
+                });
+            </script>*@
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <script src="~/vendor/global/global.min.js"></script>
+        <script src="~/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+        <script src="~/vendor/chart.js/Chart.bundle.min.js"></script>
+        <script src="~/vendor/owl-carousel/owl.carousel.js"></script>
+        <script src="~/js/custom.min.js"></script>
+    }
+</main>
+
+
+
+
+

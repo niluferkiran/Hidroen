@@ -1,0 +1,159 @@
+﻿@{
+    ViewBag.Title = "Tüm Cihazlar";
+    string apiKey = ViewBag.ApiKey;
+}
+
+@model List<SusisProject_V6.Controllers.HomeController.CihazModel>
+
+<main aria-labelledby="title">
+
+    <div class="card mt-1">
+        <div class="card-header d-sm-flex d-block" style="max-height:100px;">
+            <div class="mr-auto mb-sm-0 mb-3">
+                <h4 class="card-title mb-2">Tüm Cihazlar</h4>
+                <div class="input-group right search-area d-lg-inline-flex d-none" style="margin-top:2px;">
+
+                    <input style="border: none; background-color: #2C254A; color:white;" class="flex h-9 w-full rounded-md px-3 py-1 text-xs shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50" placeholder="Ara" name="name" id="searchInput" onkeyup="searchTable()"><div class="input-group-append">
+                        <span class="input-group-text">
+                            <a href="javascript:void(0)">
+                                <i class="flaticon-381-search-2"></i>
+                            </a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            @*<a href="@Url.Action("CihazKayitDetay", "Home", new { id = 0 },null)" class="btn btn-primary">+ Yeni</a>*@
+        </div>
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table style-1" id="ListDatatableView">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cihaz Adı</th>
+                                <th>Marka</th>
+                                <th>Tip</th>
+                                <th>IP Numarası</th>
+                                <th>SIM Kart Numarası</th>
+                                <th>IMEI Numarası</th>
+                                <th>Durum</th>
+                                <th>Son Veri</th>
+                                <th>Su Seviyesi</th>
+                                <th>Akü</th>
+
+                                <th>Ölçüm Yeri</th>
+                                <th>İl</th>
+                                <th>İlçe</th>
+                                <th></th>
+                                @*<th></th>*@
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            @foreach (var device in Model)
+                            {
+                                <tr>
+                                    <td>@device.ID</td>
+                                    <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@device.CihazAd</td>
+                                    <td>@device.fkMarka</td>
+                                    <td>@device.fkTip</td>
+                                    <td>@device.IpNo</td>
+                                    <td>@device.SimCardNo</td>
+                                    <td>@device.ImeiNo</td>
+                                    <td>
+                                        @{
+                                            int durum;
+                                            if (int.TryParse(device.Durum, out durum) && durum == 1)
+                                            {
+                                                <span class="badge badge-rounded badge-success">Aktif</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge badge-rounded badge-dark">Pasif</span>
+                                            }
+                                        }
+                                    </td>
+                                    <td>@(device.SonData.HasValue ? device.SonData.Value.ToString("yyyy-MM-dd HH:mm:ss") : "")</td>
+                                    <td>@device.SuSeviye</td>
+                                    <td>@device.Aku</td>
+
+                                    <td>@device.OlcumYeri</td>
+                                    <td>@device.IlAd</td>
+                                    <td>@device.Ilce</td>
+                                    <td>
+                                        <div class="dropdown ml-auto text-right">
+                                            <button class="btn btn-link" type="button" data-toggle="dropdown">
+                                                <svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                                        <rect x="0" y="0" width="24" height="24"></rect>
+                                                        <circle fill="#000000" cx="5" cy="12" r="2"></circle>
+                                                        <circle fill="#000000" cx="12" cy="12" r="2"></circle>
+                                                        <circle fill="#000000" cx="19" cy="12" r="2"></circle>
+                                                    </g>
+                                                </svg>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right right-0 mt-2 bg-white border rounded-md shadow-md z-10">
+                                                
+                                                @Html.ActionLink("Detay Gör", "DetayGor", "Home", new { id = device.ID,cihazad=device.CihazAd }, null)
+
+
+                                            </div>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p>No data available</p>
+            }
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="app.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        function searchTable() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("searchInput");
+            filter = input.value.toUpperCase(); 
+            table = document.getElementById("ListDatatableView");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[1]; 
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    // Metin değerini de büyük harfe dönüştürerek karşılaştırma
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="~/vendor/global/global.min.js"></script>
+    <script src="~/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+    <script src="~/vendor/chart.js/Chart.bundle.min.js"></script>
+    <script src="~/vendor/owl-carousel/owl.carousel.js"></script>
+    <script src="~/js/custom.min.js"></script>
+}
+
+
